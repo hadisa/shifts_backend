@@ -1,0 +1,162 @@
+type RequestSwap {
+  id: ID!
+  channelId: ID!
+  requestId: ID
+  userId: ID!
+  assignedUserShiftId: ID
+  assignedUserShiftIdToSwap: ID
+  requestNote: String
+  status: RequestStatus!
+  responseNote: String
+  responseByUserId: ID
+  responseAt: Time
+  createdAt: Time!
+}
+
+input RequestSwapInput {
+  channelId: ID!
+  userId: ID!
+  assignedUserShiftId: ID!
+  assignedUserShiftIdToSwap: ID
+  requestNote: String
+  responseNote: String
+  responseByUserId: ID
+  responseAt: Time
+}
+
+type User {
+  id: ID
+  firstName: String
+  lastName: String
+  email: String
+  avatar: String
+  isActive: Boolean
+  isStaff: Boolean
+}
+
+type AssignedShift {
+  id: ID!
+  break: String!
+  color: String!
+  startTime: Time!
+  endTime: Time!
+  is24Hours: Boolean!
+  label: String
+  note: String
+  shiftToOffer: AssignedShift
+  shiftToSwap: AssignedShift
+  toSwapWith: AssignedShift
+  userId: ID
+  channelId: ID
+  shiftGroupId: ID
+  type: String
+  isOpen: Boolean
+  isShared: Boolean
+  ShiftActivities: [AssignedShiftActivities]
+}
+
+type AssignedShiftActivities {
+  id: ID!
+  channelId: ID
+  shiftGroupId: ID
+  assignedShiftId: ID!
+  userId: ID
+  name: String
+  code: String
+  color: String
+  startTime: Time!
+  endTime: Time!
+  isPaid: Boolean!
+}
+
+type RequestResponse {
+  channelId: ID!
+  createdAt: Time
+  endTime: Time
+  id: ID!
+  isAllDay: Boolean
+  reason: String
+  requestId: ID!
+  requestNote: String
+  responseAt: Time
+  responseBy: User
+  responseNote: String
+  shiftOfferedTo: User
+  shiftToOffer: AssignedShift
+  shiftToSwap: AssignedShift
+  startTime: Time
+  status: RequestStatus
+  toSwapWith: AssignedShift
+  type: RequestType
+  user: User!
+}
+
+type RequestSwapResponse {
+  errors: [ShiftError!]!
+  request: RequestResponse
+}
+
+type ShiftError {
+  code: ShiftErrorCode!
+  field: String
+  message: String
+}
+
+enum ShiftErrorCode {
+  GRAPHQL_ERROR
+  INVALID
+  NOT_FOUND
+  REQUIRED
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  DENIED
+  CANCELLED
+}
+
+enum RequestType {
+  OFFER
+  SWAP
+  TIMEOFF
+}
+
+scalar Time
+
+type Query {
+  getRequestsSwaps(channelId: ID!, authUserId: ID): [RequestSwap]!
+  getRequestsSwapsByChannelIdRequestId(
+    channelId: ID!
+    requestId: ID!
+  ): RequestSwap!
+  getRequestSwap(id: ID!, authUserId: ID): RequestSwap!
+}
+
+type Mutation {
+  createRequestSwap(
+    input: RequestSwapInput!
+    authUserId: ID
+  ): RequestSwapResponse!
+  updateRequestSwap(
+    id: ID!
+    input: RequestSwapInput!
+    authUserId: ID
+  ): RequestSwapResponse!
+  deleteRequestSwap(id: ID!, authUserId: ID): RequestSwapResponse!
+  cancelRequestSwap(
+    channelId: ID!
+    requestId: ID!
+    authUserId: ID
+  ): RequestSwapResponse
+  approveRequestSwap(
+    id: ID!
+    responseNote: String
+    authUserId: ID
+  ): RequestSwapResponse!
+  denyRequestSwap(
+    id: ID!
+    responseNote: String
+    authUserId: ID
+  ): RequestSwapResponse!
+}

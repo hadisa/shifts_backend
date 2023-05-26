@@ -1,0 +1,60 @@
+ pipeline {
+    agent any
+
+    tools {
+        go 'go1.195'
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '2'))
+        skipDefaultCheckout(true)
+    }
+
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+    }
+
+    stages {
+         stage("Build_Image") {
+            steps {
+                // Clean before build
+                cleanWs()
+                // We need to explicitly checkout from SCM here
+                checkout scm
+                echo 'Building Docker Image Started...'
+                sh 'go version'
+                sh "docker build . -t aliandluigi/shift_group_member:${BUILD_ID}"
+            }
+        }
+        stage('Login') {
+            steps {
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+            }
+        }
+       
+        stage("Push") {
+            steps {
+                sh "docker push aliandluigi/shift_group_member:${BUILD_ID}"
+            }
+        }
+
+        stage("Deploy") {
+            steps {
+                sh 'echo "Deploying to production"'
+            }
+        }
+    }
+    post {
+        always {
+            sh 'docker logout'
+            cleanWs(cleanWhenNotBuilt: false,
+                    deleteDirs: true,
+                    disableDeferredWipeout: true,
+                    notFailBuild: true,
+                    cleanWhenSuccess: true,
+                    cleanWhenFailure: true,
+                    patterns: [[pattern: '.gitignore', type: 'INCLUDE'],
+                               [pattern: '.propsfile', type: 'EXCLUDE']])
+    }
+  }
+}

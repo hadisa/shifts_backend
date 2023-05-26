@@ -1,0 +1,8 @@
+.git
+*.md
+.cache
+test.graphql
+*.sql
+test.graphql
+policy.hcl
+Jenkinsfile

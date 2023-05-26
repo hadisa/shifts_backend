@@ -1,0 +1,250 @@
+type ShiftGroupMember {
+  id: ID!
+  channelId: ID!
+  shiftGroupId: ID!
+  userId: ID!
+  position: Int
+  createdAt: Time!
+}
+
+input ShiftGroupMemberInput {
+  channelId: ID!
+  shiftGroupId: ID!
+  userId: ID!
+}
+
+type User {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+  avatar: String
+  isActive: Boolean!
+  isStaff: Boolean!
+  dateJoined: Time!
+  languageCode: String!
+  lastLogin: Time
+  metadata: Map
+  note: String
+  privateMetadata: Map
+  updatedAt: Time
+}
+
+type AssignedShift {
+  id: ID!
+  break: String!
+  color: String!
+  startTime: Time!
+  endTime: Time!
+  is24Hours: Boolean!
+  label: String
+  note: String
+  shiftToOffer: AssignedShift
+  shiftToSwap: AssignedShift
+  toSwapWith: AssignedShift
+  userId: ID
+  channelId: ID
+  shiftGroupId: ID
+  type: String
+  isOpen: Boolean
+  isShared: Boolean
+  ShiftActivities: [AssignedShiftActivities]
+  createdAt: Time
+}
+
+type AssignedShiftActivities {
+  id: ID!
+  channelId: ID
+  shiftGroupId: ID
+  assignedShiftId: ID!
+  userId: ID
+  name: String
+  code: String
+  color: String
+  startTime: Time!
+  endTime: Time!
+  isPaid: Boolean!
+  createdAt: Time
+}
+
+type OpenShift {
+  id: ID!
+  channelId: ID
+  shiftGroupId: ID
+  break: String
+  color: String
+  endTime: Time
+  is24Hours: Boolean!
+  label: String
+  note: String
+  slots: Int
+  startTime: Time
+  ShiftActivities: [OpenShiftActivities]
+  createdAt: Time!
+}
+
+type OpenShiftActivities {
+  id: ID!
+  channelId: ID
+  shiftGroupId: ID
+  openShiftId: ID!
+  name: String!
+  code: String
+  color: String
+  startTime: Time!
+  endTime: Time!
+  isPaid: Boolean!
+  createdAt: Time
+}
+
+type ResponseStatus {
+  message: String
+  status: String
+}
+
+type GetNonShiftGroupMembersResponse {
+  message: String
+  result: [User]!
+  status: String
+}
+
+type GetAllUniqueShiftsResponse {
+  message: String
+  result: UniqueShifts
+  status: String
+}
+type UniqueShifts {
+  assignedShifts: [AssignedShift]
+  openShifts: [OpenShift]
+}
+
+input GetShiftsFilter {
+  includeOpenShifts: Boolean
+  includeRequests: Boolean
+  includeShifts: Boolean
+  shiftGroupIds: [ID!]
+  shiftGroupMemberIds: [ID!]
+}
+
+type GetShiftsResponse {
+  message: String
+  result: Shifts
+  status: String
+}
+
+type Shifts {
+  assignedShifts: [UserAssignedShifts]!
+  openShifts: OpenShiftInfo!
+}
+
+type UserAssignedShifts {
+  image: String
+  name: String!
+  numberOfHours: Int!
+  shifts: [AssignedShift]
+  userId: ID!
+}
+
+type OpenShiftInfo {
+  numberOfShifts: Int
+  shifts: [OpenShift]
+  title: String
+}
+
+type GetShiftsByTaskResponse {
+  message: String
+  result: [ShiftGroups]
+  status: String
+}
+
+type ShiftGroups {
+  groupId: ID!
+  groupName: String!
+  shifts: Shifts
+  position: Int
+}
+
+type ShiftGroupMemberAddResponse {
+  errors: [ShiftError!]!
+  user: User
+}
+type ShiftGroupMemberRemoveResponse {
+  errors: [ShiftError!]!
+  user: User
+}
+
+type ShiftError {
+  code: ShiftErrorCode!
+  field: String
+  message: String
+}
+
+enum ShiftErrorCode {
+  GRAPHQL_ERROR
+  INVALID
+  NOT_FOUND
+  REQUIRED
+}
+
+scalar Time
+scalar Map
+
+type Query {
+  getNonShiftGroupMembers(
+    channelId: ID!
+    shiftGroupId: ID!
+    authUserId: ID
+  ): GetNonShiftGroupMembersResponse
+  getShiftGroupMembers(
+    shiftGroupId: ID!
+    channel: String!
+    authUserId: ID
+  ): [User]!
+  getAllShiftMembers(first: Int, last: Int, authUserId: ID): [User!]!
+  getAllUniqueShifts(
+    channelId: ID!
+    shiftGroupId: ID!
+    authUserId: ID
+  ): GetAllUniqueShiftsResponse
+  getShiftsByPeople(
+    channelId: ID!
+    endDate: Time!
+    filter: GetShiftsFilter
+    shiftGroupId: ID!
+    startDate: Time!
+    authUserId: ID
+  ): GetShiftsResponse!
+
+  getShiftsByTask(
+    channelId: ID!
+    endDate: Time!
+    filter: GetShiftsFilter
+    startDate: Time!
+    authUserId: ID
+  ): GetShiftsByTaskResponse
+
+  getShiftGroupMembersList(
+    channelId: ID!
+    shiftGroupId: ID!
+    authUserId: ID
+  ): [ShiftGroupMember]!
+}
+
+type Mutation {
+  shiftGroupMemberAdd(
+    input: ShiftGroupMemberInput!
+    authUserId: ID
+  ): ShiftGroupMemberAddResponse
+  shiftGroupMembersReorder(
+    channelId: ID
+    shiftGroupId: ID!
+    userIds: [ID!]!
+    authUserId: ID
+  ): ResponseStatus!
+  shiftGroupMemberRemove(
+    channelId: ID!
+    shiftGroupId: ID!
+    userId: ID!
+    authUserId: ID
+  ): ShiftGroupMemberRemoveResponse
+}

@@ -1,0 +1,173 @@
+type RequestTimeOff {
+  id: ID!
+  userId: ID!
+  channelId: ID
+  requestId: ID
+  startTime: Time!
+  endTime: Time
+  is24Hours: Boolean
+  reason: String
+  requestNote: String
+  status: RequestStatus!
+  responseNote: String
+  responseByUserId: ID
+  responseAt: Time
+  createdAt: Time!
+}
+
+input RequestTimeOffInput {
+  userId: ID!
+  channelId: ID!
+  startTime: Time!
+  endTime: Time
+  is24Hours: Boolean!
+  reason: String
+  requestNote: String
+  responseNote: String
+  responseByUserId: ID
+  responseAt: Time
+}
+
+input RequestsInput {
+  channelId: ID
+  userId: ID
+  recipientId: ID
+  type: String
+}
+
+type User {
+  id: ID
+  firstName: String
+  lastName: String
+  email: String
+  avatar: String
+  isActive: Boolean
+  isStaff: Boolean
+}
+
+type AssignedShift {
+  id: ID!
+  break: String!
+  color: String!
+  startTime: Time!
+  endTime: Time!
+  is24Hours: Boolean!
+  label: String
+  note: String
+  shiftToOffer: AssignedShift
+  shiftToSwap: AssignedShift
+  toSwapWith: AssignedShift
+  userId: ID
+  channelId: ID
+  shiftGroupId: ID
+  type: String
+  isOpen: Boolean
+  isShared: Boolean
+  ShiftActivities: [AssignedShiftActivities]
+}
+
+type AssignedShiftActivities {
+  id: ID!
+  channelId: ID
+  shiftGroupId: ID
+  assignedShiftId: ID!
+  userId: ID
+  name: String
+  code: String
+  color: String
+  startTime: Time!
+  endTime: Time!
+  isPaid: Boolean!
+}
+
+type TimeOffResponse {
+  errors: [ShiftError!]!
+  request: RequestResponse
+}
+
+type ShiftError {
+  code: ShiftErrorCode!
+  field: String
+  message: String
+}
+
+enum ShiftErrorCode {
+  GRAPHQL_ERROR
+  INVALID
+  NOT_FOUND
+  REQUIRED
+}
+
+type RequestResponse {
+  channelId: ID!
+  createdAt: Time
+  endTime: Time
+  id: ID!
+  isAllDay: Boolean
+  reason: String
+  requestId: ID!
+  requestNote: String
+  responseAt: Time
+  responseBy: User
+  responseNote: String
+  shiftOfferedTo: User
+  shiftToOffer: AssignedShift
+  shiftToSwap: AssignedShift
+  startTime: Time
+  status: RequestStatus
+  toSwapWith: AssignedShift
+  type: RequestType
+  user: User!
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  DENIED
+  CANCELLED
+}
+
+enum RequestType {
+  OFFER
+  SWAP
+  TIMEOFF
+}
+
+scalar Time
+
+type Query {
+  getRequestTimeOff(id: ID!, authUserId: ID): RequestTimeOff!
+  getRequestTimeOffs(authUserId: ID): [RequestTimeOff]!
+  getRequestTimeOffsByChannelIdRequestId(
+    channelId: ID!
+    requestId: ID!
+  ): RequestTimeOff!
+}
+
+type Mutation {
+  createRequestTimeOff(
+    input: RequestTimeOffInput!
+    authUserId: ID
+  ): TimeOffResponse
+  updateRequestTimeOff(
+    id: ID!
+    input: RequestTimeOffInput!
+    authUserId: ID
+  ): TimeOffResponse
+  deleteRequestTimeOff(id: ID!, authUserId: ID): TimeOffResponse
+  cancelRequestTimeOff(
+    channelId: ID!
+    requestId: ID!
+    authUserId: ID
+  ): TimeOffResponse
+  approveRequestTimeOff(
+    id: ID!
+    responseNote: String
+    authUserId: ID
+  ): TimeOffResponse
+  denyRequestTimeOff(
+    id: ID!
+    responseNote: String
+    authUserId: ID
+  ): TimeOffResponse
+}

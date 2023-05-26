@@ -1,0 +1,27 @@
+apiVersion: core.openfunction.io/v1beta1
+kind: Function
+metadata:
+  name: user-permission
+spec:
+  version: "v1.0.0"
+  image: "yaseenakbari/user-permission:v1"
+  # imageCredentials:
+  #   name: push-secret
+  # build:
+  #   builder: openfunction/buildah:v1.23.1
+  #   srcRepo:
+  #     url: "https://gitea.friendlysquad.io/Management/permission.git"
+  #     sourceSubPath: "/"
+  #     revision: "main"
+  #     credentials:
+  #       name: git-repo-secret
+  #   shipwright:
+  #     strategy:
+  #       name: buildah
+  #       kind: ClusterBuildStrategy
+  serving:
+    runtime: knative
+    template:
+      containers:
+        - name: function
+          imagePullPolicy: IfNotPresent

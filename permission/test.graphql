@@ -1,0 +1,52 @@
+mutation {
+  grantPermission(
+    input: {
+      nameSpace: shifts
+      userId: "58500165-593c-471d-b92b-ac1ebd7b1ea3"
+      permission: MANAGE_ALL
+      object: "shared_schedule"
+    }
+  ) {
+    id
+    nameSpace
+    permission
+    object
+    grantedAt
+    user {
+      id
+      email
+      firstName
+      lastName
+    }
+  }
+}
+
+query {
+  getAllGrantedPermissions {
+    permissionId
+    nameSpace
+    permission
+    object
+    grantedAt
+    user {
+      id
+      firstName
+      lastName
+      email
+    }
+  }
+}
+
+query {
+  getGrantedPermissions(userId: "58500165-593c-471d-b92b-ac1ebd7b1ea3") {
+    firstName
+    lastName
+    email
+    permissions {
+      id
+      nameSpace
+      object
+      grantedAt
+    }
+  }
+}

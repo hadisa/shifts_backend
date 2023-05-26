@@ -1,0 +1,51 @@
+mutation {
+  createRequestSwap(
+    input: {
+      channelId: "4a2cfef2-a6f9-4c2c-8ed5-062f4e2c9712"
+      userId: "58500165-593c-471d-b92b-ac1ebd7b1ea3"
+      assignedUserShiftId: "b72a6635-f3e3-4ad1-8b85-d61addc94c41"
+      assignedUserShiftIdToSwap: "7261620f-657c-48c6-a0ed-e9ff447defc0"
+      requestNote: "a note here 33"
+      responseNote: "a note here as well"
+      responseByUserId: "58500165-593c-471d-b92b-ac1ebd7b1ea3"
+      responseAt: "2022-10-15T00:00:00.000Z"
+    }
+    authUserId: "58500165-593c-471d-b92b-ac1ebd7b1ea3"
+  ) {
+    errors {
+      code
+      field
+      message
+    }
+    request {
+      channelId
+      id
+      requestId
+      type
+      user {
+        id
+        firstName
+        lastName
+      }
+    }
+  }
+}
+
+{
+  getRequestsSwaps(
+    channelId: "4a2cfef2-a6f9-4c2c-8ed5-062f4e2c9712"
+    authUserId: "58500165-593c-471d-b92b-ac1ebd7b1ea3"
+  ) {
+    id
+    userId
+    channelId
+    responseNote
+    requestId
+    requestNote
+    status
+    responseAt
+    assignedUserShiftId
+    assignedUserShiftIdToSwap
+    createdAt
+  }
+}

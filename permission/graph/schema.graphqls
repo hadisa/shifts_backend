@@ -1,0 +1,88 @@
+"""
+the number of users that have this permission or the number of users that have this permission group also can be counted by the number of granted permissions
+"""
+type GrantedPermission {
+  id: ID!
+  nameSpace: String!
+  """
+  Auth User (ID)
+  """
+  userId: String!
+  """
+  Relation between a Subject and a Object
+  """
+  permission: String!
+  """
+  eg. 'User', 'Post', 'open shift'
+  """
+  object: String!
+  grantedAt: Time!
+}
+
+input GrantedPermissionInput {
+  nameSpace: NameSpaceEnum!
+  userId: ID!
+  permission: PermissionEnum!
+  object: String!
+}
+
+type GrantedPermissionResponse {
+  permissionId: ID
+  nameSpace: String
+  permission: String
+  object: String
+  grantedAt: Time
+  user: User!
+}
+
+type GetGrantedPermissionsResponse {
+  firstName: String!
+  lastName: String
+  email: String
+  permissions: [GrantedPermission!]!
+}
+
+type User {
+  id: ID
+  email: String
+  firstName: String
+  lastName: String
+}
+
+scalar Time
+
+enum NameSpaceEnum {
+  shifts
+  booking
+}
+
+enum PermissionEnum {
+  READ
+  READ_ALL
+  WRITE
+  WRITE_ALL
+  MANAGE
+  MANAGE_ALL
+}
+
+type Mutation {
+  grantPermission(input: GrantedPermissionInput!): GrantedPermissionResponse!
+  """
+  Delete a granted permission
+  """
+  revokePermission(id: ID!): String
+}
+
+type Query {
+  getGrantedPermissions(userId: ID!): GetGrantedPermissionsResponse!
+  getAllGrantedPermissions: [GrantedPermissionResponse]!
+  """
+  subject: userId, relation: permission, object: assigned object
+  """
+  CheckPermission(
+    NameSpace: NameSpaceEnum!
+    userId: ID!
+    permission: PermissionEnum!
+    object: ID!
+  ): Boolean!
+}

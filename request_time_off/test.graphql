@@ -1,0 +1,52 @@
+mutation {
+  createRequestTimeOff(
+    input: {
+      userId: "58500165-593c-471d-b92b-ac1ebd7b1ea3"
+      channelId: "4a2cfef2-a6f9-4c2c-8ed5-062f4e2c9712"
+      startTime: "2022-10-15T00:00:00.000Z"
+      endTime: "2023-11-15T00:00:00.000Z"
+      is24Hours: false
+      reason: "note reason"
+      requestNote: "a note here"
+      responseNote: "for test"
+      responseByUserId: "58500165-593c-471d-b92b-ac1ebd7b1ea3"
+      responseAt: "2023-10-15T00:00:00.000Z"
+    }
+    authUserId: "58500165-593c-471d-b92b-ac1ebd7b1ea3"
+  ) {
+    request {
+      channelId
+      id
+      requestNote
+      user {
+        id
+        lastName
+      }
+    }
+  }
+}
+
+mutation {
+  denyRequestTimeOff(
+    id: "bfced63d-bcbe-4af0-a291-e9e2763bac22"
+    authUserId: "58500165-593c-471d-b92b-ac1ebd7b1ea3"
+  ) {
+    errors {
+      code
+      field
+      message
+    }
+    request {
+      id
+      status
+    }
+  }
+}
+
+{
+  getRequestTimeOffs(authUserId: "58500165-593c-471d-b92b-ac1ebd7b1ea3") {
+    id
+    userId
+    status
+  }
+}

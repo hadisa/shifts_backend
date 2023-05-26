@@ -1,0 +1,37 @@
+mutation {
+  accountRegister(
+    input: {
+      identityId: "0a90b5dc-6f40-483b-b0ba-bd42b1fd2bb1"
+      firstName: "Nahid"
+      lastName: "Ashna"
+      languageCode: AF
+      email: "nahid.dev@gmail.com"
+      password: "1234567890"
+      redirectUrl: ""
+      channel: "default-channel"
+    }
+  ) {
+    user {
+      id
+      email
+      firstName
+      lastName
+      isActive
+      note
+    }
+  }
+}
+
+query {
+  users {
+    id
+    firstName
+    lastName
+    email
+    isStaff
+    isActive
+    phone
+    avatar
+    note
+  }
+}

@@ -1,0 +1,259 @@
+mutation {
+  shiftGroupMemberAdd(
+    input: {
+      channelId: "4a2cfef2-a6f9-4c2c-8ed5-062f4e2c9712"
+      shiftGroupId: "6850aac4-4dcf-4a39-bbb3-1c245770ddd4"
+      userId: "91da8f38-31e0-4d27-9dc1-53cc0e43c5bb"
+    }
+    authUserId: "58500165-593c-471d-b92b-ac1ebd7b1ea3"
+  ) {
+    errors {
+      code
+      field
+      message
+    }
+    user {
+      id
+      firstName
+      lastName
+    }
+  }
+}
+
+{
+  getShiftGroupMembers(
+    shiftGroupId: "c562f1a0-86a3-4e3e-a5bc-07168eb159bd"
+    channel: "default-channel"
+    authUserId: "58500165-593c-471d-b92b-ac1ebd7b1ea3"
+  ) {
+    id
+    firstName
+    lastName
+    email
+    languageCode
+    avatar
+    isStaff
+    isActive
+  }
+}
+
+{
+  getNonShiftGroupMembers(
+    shiftGroupId: "c562f1a0-86a3-4e3e-a5bc-07168eb159bd"
+    channelId: "4a2cfef2-a6f9-4c2c-8ed5-062f4e2c9712"
+    authUserId: "58500165-593c-471d-b92b-ac1ebd7b1ea3"
+  ) {
+    message
+    status
+    result {
+      id
+      firstName
+      lastName
+      email
+      languageCode
+      avatar
+      isStaff
+      isActive
+    }
+  }
+}
+
+{
+  getAllUniqueShifts(
+    shiftGroupId: "c562f1a0-86a3-4e3e-a5bc-07168eb159bd"
+    channelId: "4a2cfef2-a6f9-4c2c-8ed5-062f4e2c9712"
+    authUserId: "58500165-593c-471d-b92b-ac1ebd7b1ea3"
+  ) {
+    message
+    status
+    result {
+      assignedShifts {
+        id
+        color
+        label
+        startTime
+        endTime
+        ShiftActivities {
+          id
+          name
+          color
+          startTime
+          endTime
+        }
+      }
+      openShifts {
+        id
+        color
+        label
+        startTime
+        endTime
+        ShiftActivities {
+          code
+          id
+          color
+          startTime
+          endTime
+        }
+      }
+    }
+  }
+}
+
+{
+  getShiftsByTask(
+    channelId: "4a2cfef2-a6f9-4c2c-8ed5-062f4e2c9712"
+    startDate: "2020-10-15T00:00:00.000Z"
+    endDate: "2023-12-15T00:00:00.000Z"
+    filter: {
+      includeOpenShifts: true
+      includeShifts: true
+      includeRequests: true
+      shiftGroupIds: [
+        "your_shift_group_1"
+        "your_shift_group_2"
+        "your_shift_group_n"
+      ]
+    }
+    authUserId: "58500165-593c-471d-b92b-ac1ebd7b1ea3"
+  ) {
+    message
+    status
+    result {
+      groupId
+      groupName
+      shifts {
+        assignedShifts {
+          userId
+          name
+          image
+          numberOfHours
+          shifts {
+            id
+            label
+            note
+            color
+            startTime
+            endTime
+            break
+            is24Hours
+            type
+            ShiftActivities {
+              id
+              name
+              code
+              color
+              startTime
+              endTime
+              isPaid
+            }
+          }
+        }
+        openShifts {
+          numberOfShifts
+          title
+          shifts {
+            id
+            label
+            note
+            color
+            startTime
+            endTime
+            break
+            is24Hours
+            slots
+            ShiftActivities {
+              id
+              name
+              code
+              color
+              startTime
+              endTime
+              isPaid
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+query {
+  getShiftsByPeople(
+    channelId: "4a2cfef2-a6f9-4c2c-8ed5-062f4e2c9712"
+    startDate: "2022-02-15T00:00:00.000Z"
+    endDate: "2023-12-15T00:00:00.000Z"
+    shiftGroupId: "c562f1a0-86a3-4e3e-a5bc-07168eb159bd"
+    filter: { includeOpenShifts: true, includeShifts: true }
+    authUserId: "58500165-593c-471d-b92b-ac1ebd7b1ea3"
+  ) {
+    message
+    status
+    result {
+      assignedShifts {
+        userId
+        name
+        image
+        numberOfHours
+        shifts {
+          id
+          label
+          note
+          color
+          ShiftActivities {
+            id
+            startTime
+            endTime
+          }
+        }
+      }
+      openShifts {
+        numberOfShifts
+        title
+        shifts {
+          id
+          channelId
+          color
+          label
+          note
+          ShiftActivities {
+            id
+            name
+            code
+          }
+        }
+      }
+    }
+  }
+}
+
+mutation {
+  shiftGroupMemberRemove(
+    channelId: "4a2cfef2-a6f9-4c2c-8ed5-062f4e2c9712"
+    shiftGroupId: "6850aac4-4dcf-4a39-bbb3-1c245770ddd4"
+    userId: "91da8f38-31e0-4d27-9dc1-53cc0e43c5bb"
+    authUserId: "58500165-593c-471d-b92b-ac1ebd7b1ea3"
+  ) {
+    errors {
+      field
+      message
+      code
+    }
+    user {
+      id
+      firstName
+      lastName
+    }
+  }
+}
+
+mutation {
+  shiftGroupMembersReorder(
+    channelId: "4a2cfef2-a6f9-4c2c-8ed5-062f4e2c9712"
+    shiftGroupId: "6850aac4-4dcf-4a39-bbb3-1c245770ddd4"
+    userIds: ["id_1", "id_2", "id_3"]
+    authUserId: "58500165-593c-471d-b92b-ac1ebd7b1ea3"
+  ) {
+    message
+    status
+  }
+}
