@@ -96,12 +96,6 @@ type AssignedShiftDeleteResponse struct {
 	} `json:"data"`
 }
 
-type TimeOffDeleteResponse struct {
-	Data struct {
-		DeleteTimeOffs string `json:"deleteTimeOffs"`
-	} `json:"data"`
-}
-
 type UserResponse struct {
 	Data struct {
 		User struct {
@@ -201,6 +195,23 @@ type GetOpenShiftsResponse struct {
 	} `json:"data"`
 }
 
+type GetTimeOffResponse struct {
+	Data struct {
+		GetTimeOffs []struct {
+			ID           string     `json:"id"`
+			UserID       *string    `json:"userId,omitempty"`
+			ChannelID    *string    `json:"channelId,omitempty"`
+			ShiftGroupID *string    `json:"shiftGroupId,omitempty"`
+			StartTime    time.Time  `json:"startTime"`
+			EndTime      time.Time  `json:"endTime"`
+			Is24Hours    bool       `json:"is24Hours"`
+			Label        string     `json:"label"`
+			Color        string     `json:"color"`
+			Note         string     `json:"note"`
+			CreatedAt    *time.Time `json:"createdAt,omitempty"`
+		} `json:"getTimeOffs"`
+	} `json:"data"`
+}
 type GetAssignedShiftsByTimeResponse struct {
 	Data struct {
 		GetAssignedShiftsByTime []struct {

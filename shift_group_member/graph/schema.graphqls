@@ -173,12 +173,6 @@ type ShiftGroupMemberRemoveResponse {
   user: User
 }
 
-type ShiftError {
-  code: ShiftErrorCode!
-  field: String
-  message: String
-}
-
 enum ShiftErrorCode {
   GRAPHQL_ERROR
   INVALID
@@ -228,6 +222,16 @@ type Query {
     shiftGroupId: ID!
     authUserId: ID
   ): [ShiftGroupMember]!
+
+  getTimeOff(id: ID!, authUserId: ID): AssignedShift!
+  getTimeOffs(
+    channelId: ID!
+    shiftGroupId: ID!
+    userId: ID!
+    startTime: Time!
+    endTime: Time!
+    authUserId: ID
+  ): [AssignedShift!]!
 }
 
 type Mutation {
@@ -247,4 +251,86 @@ type Mutation {
     userId: ID!
     authUserId: ID
   ): ShiftGroupMemberRemoveResponse
+
+  createTimeOff(input: TimeOffInput!, authUserId: ID): TimeOffAddResponse
+  updateTimeOff(
+    id: ID!
+    input: TimeOffInput!
+    authUserId: ID
+  ): TimeOffEditResponse
+  deleteTimeOff(id: ID!, authUserId: ID): TimeOffDeleteResponse
+  deleteTimeOffs(
+    channelId: ID!
+    shiftGroupId: ID!
+    userId: ID!
+    authUserId: ID
+  ): String!
+}
+
+type TimeOff {
+  id: ID!
+  userId: ID
+  channelId: ID
+  shiftGroupId: ID
+  startTime: Time!
+  endTime: Time!
+  is24Hours: Boolean!
+  label: String!
+  color: String!
+  note: String!
+  createdAt: Time
+}
+
+input TimeOffInput {
+  userId: ID
+  channelId: ID
+  shiftGroupId: ID
+  startTime: Time!
+  endTime: Time!
+  is24Hours: Boolean!
+  label: String!
+  color: ShiftColorEnum!
+  note: String
+}
+
+type TimeOffAddResponse {
+  errors: [ShiftError!]!
+  timeoff: AssignedShift
+}
+
+type TimeOffEditResponse {
+  errors: [ShiftError!]!
+  timeoff: AssignedShift
+}
+
+type TimeOffDeleteResponse {
+  errors: [ShiftError!]!
+  timeoff: AssignedShift
+}
+
+type ShiftError {
+  code: ShiftErrorCode!
+  field: String
+  message: String
+}
+
+enum ShiftColorEnum {
+  BLUE
+  DARKBLUE
+  GREEN
+  DARKGREEN
+  DARKCYAN
+  CYAN
+  MAGENTA
+  DARKMAGENTA
+  ORANGE
+  DARKORANGE
+  GRAY
+  WHITE
+  YELLOW
+  LAVENDER
+  DARKLAVENDER
+  RED
+  PINK
+  PURPLE
 }

@@ -7231,66 +7231,74 @@ func (ec *executionContext) unmarshalInputRequestSwapInput(ctx context.Context, 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("channelId"))
-			it.ChannelID, err = ec.unmarshalNID2string(ctx, v)
+			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ChannelID = data
 		case "userId":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
-			it.UserID, err = ec.unmarshalNID2string(ctx, v)
+			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.UserID = data
 		case "assignedUserShiftId":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assignedUserShiftId"))
-			it.AssignedUserShiftID, err = ec.unmarshalNID2string(ctx, v)
+			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.AssignedUserShiftID = data
 		case "assignedUserShiftIdToSwap":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assignedUserShiftIdToSwap"))
-			it.AssignedUserShiftIDToSwap, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.AssignedUserShiftIDToSwap = data
 		case "requestNote":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("requestNote"))
-			it.RequestNote, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.RequestNote = data
 		case "responseNote":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("responseNote"))
-			it.ResponseNote, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ResponseNote = data
 		case "responseByUserId":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("responseByUserId"))
-			it.ResponseByUserID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ResponseByUserID = data
 		case "responseAt":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("responseAt"))
-			it.ResponseAt, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ResponseAt = data
 		}
 	}
 

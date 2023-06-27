@@ -22,39 +22,39 @@ import (
 func (r *mutationResolver) ShiftGroupMemberAdd(ctx context.Context, input model.ShiftGroupMemberInput, authUserID *string) (*model.ShiftGroupMemberAddResponse, error) {
 	errorMessage := "Something went wrong while adding the shift group." // default error message
 
-	if authUserID == nil || *authUserID == string("") {
-		errorMessage = AUTH_USER_ID_REQUIRED
-		return util.ShiftGroupMemberAddRHandleError(&errorMessage, model.ShiftErrorCodeRequired)
-	}
+	// if authUserID == nil || *authUserID == string("") {
+	// 	errorMessage = AUTH_USER_ID_REQUIRED
+	// 	return util.ShiftGroupMemberAddRHandleError(&errorMessage, model.ShiftErrorCodeRequired)
+	// }
 
 	var err error
-	permission := false
+	// permission := false
 
 	// validate permission
-	permission, err = util.CheckPermission("shift_group_member", "WRITE_ALL", *authUserID)
-	if err != nil {
-		sentry.CaptureException(err)
-		defer sentry.Flush(2 * time.Second)
+	// permission, err = util.CheckPermission("shift_group_member", "WRITE_ALL", *authUserID)
+	// if err != nil {
+	// 	sentry.CaptureException(err)
+	// 	defer sentry.Flush(2 * time.Second)
 
-		errorMessage = err.Error()
-		return util.ShiftGroupMemberAddRHandleError(&errorMessage, model.ShiftErrorCodeInvalid)
-	}
+	// 	errorMessage = err.Error()
+	// 	return util.ShiftGroupMemberAddRHandleError(&errorMessage, model.ShiftErrorCodeInvalid)
+	// }
 
-	if !permission {
-		permission, err = util.CheckPermission("shift_group_member", "WRITE", *authUserID)
-		if err != nil {
-			sentry.CaptureException(err)
-			defer sentry.Flush(2 * time.Second)
+	// if !permission {
+	// 	permission, err = util.CheckPermission("shift_group_member", "WRITE", *authUserID)
+	// 	if err != nil {
+	// 		sentry.CaptureException(err)
+	// 		defer sentry.Flush(2 * time.Second)
 
-			errorMessage = err.Error()
-			return util.ShiftGroupMemberAddRHandleError(&errorMessage, model.ShiftErrorCodeInvalid)
-		}
-	}
+	// 		errorMessage = err.Error()
+	// 		return util.ShiftGroupMemberAddRHandleError(&errorMessage, model.ShiftErrorCodeInvalid)
+	// 	}
+	// }
 
-	if !permission {
-		errorMessage = "Permission denied: shift_group_member.WRITE, shift_group_member.WRITE_ALL"
-		return util.ShiftGroupMemberAddRHandleError(&errorMessage, model.ShiftErrorCodeRequired)
-	}
+	// if !permission {
+	// 	errorMessage = "Permission denied: shift_group_member.WRITE, shift_group_member.WRITE_ALL"
+	// 	return util.ShiftGroupMemberAddRHandleError(&errorMessage, model.ShiftErrorCodeRequired)
+	// }
 
 	// validate the input
 	if input.ChannelID == "" {
@@ -122,56 +122,56 @@ func (r *mutationResolver) ShiftGroupMemberAdd(ctx context.Context, input model.
 // ShiftGroupMembersReorder is the resolver for the shiftGroupMembersReorder field.
 func (r *mutationResolver) ShiftGroupMembersReorder(ctx context.Context, channelID *string, shiftGroupID string, userIds []string, authUserID *string) (*model.ResponseStatus, error) {
 	var message, status string
-	if authUserID == nil || *authUserID == string("") {
-		message = AUTH_USER_ID_REQUIRED
-		status = "error"
-		return &model.ResponseStatus{
-			Message: &message,
-			Status:  &status,
-		}, nil
-	}
-	var err error
-	permission := false
+	// if authUserID == nil || *authUserID == string("") {
+	// 	message = AUTH_USER_ID_REQUIRED
+	// 	status = "error"
+	// 	return &model.ResponseStatus{
+	// 		Message: &message,
+	// 		Status:  &status,
+	// 	}, nil
+	// }
+	// var err error
+	// permission := false
 
 	// validate permission
-	permission, err = util.CheckPermission("shift_group_member", "WRITE_ALL", *authUserID)
-	if err != nil {
-		sentry.CaptureException(err)
-		defer sentry.Flush(2 * time.Second)
+	// permission, err = util.CheckPermission("shift_group_member", "WRITE_ALL", *authUserID)
+	// if err != nil {
+	// 	sentry.CaptureException(err)
+	// 	defer sentry.Flush(2 * time.Second)
 
-		message = err.Error()
-		status = "error"
-		return &model.ResponseStatus{
-			Message: &message,
-			Status:  &status,
-		}, nil
+	// 	message = err.Error()
+	// 	status = "error"
+	// 	return &model.ResponseStatus{
+	// 		Message: &message,
+	// 		Status:  &status,
+	// 	}, nil
 
-	}
+	// }
 
-	if !permission {
-		permission, err = util.CheckPermission("shift_group_member", "MANAGE", *authUserID)
-		if err != nil {
-			sentry.CaptureException(err)
-			defer sentry.Flush(2 * time.Second)
+	// if !permission {
+	// 	permission, err = util.CheckPermission("shift_group_member", "MANAGE", *authUserID)
+	// 	if err != nil {
+	// 		sentry.CaptureException(err)
+	// 		defer sentry.Flush(2 * time.Second)
 
-			message = err.Error()
-			status = "error"
-			return &model.ResponseStatus{
-				Message: &message,
-				Status:  &status,
-			}, nil
-		}
-	}
+	// 		message = err.Error()
+	// 		status = "error"
+	// 		return &model.ResponseStatus{
+	// 			Message: &message,
+	// 			Status:  &status,
+	// 		}, nil
+	// 	}
+	// }
 
-	if !permission {
-		message = "Permission denied: shift_group_member.MANAGE, shift_group_member.WRITE_ALL"
-		status = "error"
+	// if !permission {
+	// 	message = "Permission denied: shift_group_member.MANAGE, shift_group_member.WRITE_ALL"
+	// 	status = "error"
 
-		return &model.ResponseStatus{
-			Message: &message,
-			Status:  &status,
-		}, nil
-	}
+	// 	return &model.ResponseStatus{
+	// 		Message: &message,
+	// 		Status:  &status,
+	// 	}, nil
+	// }
 
 	if len(userIds) <= 1 {
 		message = "userIds must have at least 2 items"
@@ -225,39 +225,39 @@ func (r *mutationResolver) ShiftGroupMembersReorder(ctx context.Context, channel
 func (r *mutationResolver) ShiftGroupMemberRemove(ctx context.Context, channelID string, shiftGroupID string, userID string, authUserID *string) (*model.ShiftGroupMemberRemoveResponse, error) {
 	errorMessage := "Something went wrong while removing the shift group." // default error message
 
-	if authUserID == nil || *authUserID == string("") {
-		errorMessage = AUTH_USER_ID_REQUIRED
-		return util.ShiftGroupMemberRemoveRHandleError(&errorMessage, model.ShiftErrorCodeRequired)
-	}
+	// if authUserID == nil || *authUserID == string("") {
+	// 	errorMessage = AUTH_USER_ID_REQUIRED
+	// 	return util.ShiftGroupMemberRemoveRHandleError(&errorMessage, model.ShiftErrorCodeRequired)
+	// }
 
 	var err error
-	permission := false
+	// permission := false
 
 	// validate permission
-	permission, err = util.CheckPermission("shift_group_member", "WRITE_ALL", *authUserID)
-	if err != nil {
-		sentry.CaptureException(err)
-		defer sentry.Flush(2 * time.Second)
+	// permission, err = util.CheckPermission("shift_group_member", "WRITE_ALL", *authUserID)
+	// if err != nil {
+	// 	sentry.CaptureException(err)
+	// 	defer sentry.Flush(2 * time.Second)
 
-		errorMessage = err.Error()
-		return util.ShiftGroupMemberRemoveRHandleError(&errorMessage, model.ShiftErrorCodeRequired)
-	}
+	// 	errorMessage = err.Error()
+	// 	return util.ShiftGroupMemberRemoveRHandleError(&errorMessage, model.ShiftErrorCodeRequired)
+	// }
 
-	if !permission {
-		permission, err = util.CheckPermission("shift_group_member", "MANAGE", *authUserID)
-		if err != nil {
-			sentry.CaptureException(err)
-			defer sentry.Flush(2 * time.Second)
+	// if !permission {
+	// 	permission, err = util.CheckPermission("shift_group_member", "MANAGE", *authUserID)
+	// 	if err != nil {
+	// 		sentry.CaptureException(err)
+	// 		defer sentry.Flush(2 * time.Second)
 
-			errorMessage = err.Error()
-			return util.ShiftGroupMemberRemoveRHandleError(&errorMessage, model.ShiftErrorCodeInvalid)
-		}
-	}
+	// 		errorMessage = err.Error()
+	// 		return util.ShiftGroupMemberRemoveRHandleError(&errorMessage, model.ShiftErrorCodeInvalid)
+	// 	}
+	// }
 
-	if !permission {
-		errorMessage = "Permission denied: shift_group_member.MANAGE, shift_group_member.WRITE_ALL"
-		return util.ShiftGroupMemberRemoveRHandleError(&errorMessage, model.ShiftErrorCodeRequired)
-	}
+	// if !permission {
+	// 	errorMessage = "Permission denied: shift_group_member.MANAGE, shift_group_member.WRITE_ALL"
+	// 	return util.ShiftGroupMemberRemoveRHandleError(&errorMessage, model.ShiftErrorCodeRequired)
+	// }
 
 	// validate the input
 	if channelID == "" {
@@ -380,66 +380,86 @@ func (r *mutationResolver) ShiftGroupMemberRemove(ctx context.Context, channelID
 	}, nil
 }
 
+// CreateTimeOff is the resolver for the createTimeOff field.
+func (r *mutationResolver) CreateTimeOff(ctx context.Context, input model.TimeOffInput, authUserID *string) (*model.TimeOffAddResponse, error) {
+	panic(fmt.Errorf("not implemented: CreateTimeOff - createTimeOff"))
+}
+
+// UpdateTimeOff is the resolver for the updateTimeOff field.
+func (r *mutationResolver) UpdateTimeOff(ctx context.Context, id string, input model.TimeOffInput, authUserID *string) (*model.TimeOffEditResponse, error) {
+	panic(fmt.Errorf("not implemented: UpdateTimeOff - updateTimeOff"))
+}
+
+// DeleteTimeOff is the resolver for the deleteTimeOff field.
+func (r *mutationResolver) DeleteTimeOff(ctx context.Context, id string, authUserID *string) (*model.TimeOffDeleteResponse, error) {
+	panic(fmt.Errorf("not implemented: DeleteTimeOff - deleteTimeOff"))
+}
+
+// DeleteTimeOffs is the resolver for the deleteTimeOffs field.
+func (r *mutationResolver) DeleteTimeOffs(ctx context.Context, channelID string, shiftGroupID string, userID string, authUserID *string) (string, error) {
+	panic(fmt.Errorf("not implemented: DeleteTimeOffs - deleteTimeOffs"))
+}
+
 // GetNonShiftGroupMembers is the resolver for the getNonShiftGroupMembers field.
 func (r *queryResolver) GetNonShiftGroupMembers(ctx context.Context, channelID string, shiftGroupID string, authUserID *string) (*model.GetNonShiftGroupMembersResponse, error) {
 	var message, status string
-	if authUserID == nil || *authUserID == string("") {
-		message = AUTH_USER_ID_REQUIRED
-		status = "error"
+	// if authUserID == nil || *authUserID == string("") {
+	// 	message = AUTH_USER_ID_REQUIRED
+	// 	status = "error"
 
-		return &model.GetNonShiftGroupMembersResponse{
-			Message: &message,
-			Status:  &status,
-			Result:  nil,
-		}, nil
-	}
+	// 	return &model.GetNonShiftGroupMembersResponse{
+	// 		Message: &message,
+	// 		Status:  &status,
+	// 		Result:  nil,
+	// 	}, nil
+	// }
 
 	var err error
-	permission := false
+	// permission := false
 
-	// validate permission
-	permission, err = util.CheckPermission("shift_group_member", "READ_ALL", *authUserID)
-	if err != nil {
-		sentry.CaptureException(err)
-		defer sentry.Flush(2 * time.Second)
+	// // validate permission
+	// permission, err = util.CheckPermission("shift_group_member", "READ_ALL", *authUserID)
+	// if err != nil {
+	// 	sentry.CaptureException(err)
+	// 	defer sentry.Flush(2 * time.Second)
 
-		message = err.Error()
-		status = "error"
+	// 	message = err.Error()
+	// 	status = "error"
 
-		return &model.GetNonShiftGroupMembersResponse{
-			Message: &message,
-			Status:  &status,
-			Result:  nil,
-		}, nil
-	}
+	// 	return &model.GetNonShiftGroupMembersResponse{
+	// 		Message: &message,
+	// 		Status:  &status,
+	// 		Result:  nil,
+	// 	}, nil
+	// }
 
-	if !permission {
-		permission, err = util.CheckPermission("shift_group_member", "READ", *authUserID)
-		if err != nil {
-			sentry.CaptureException(err)
-			defer sentry.Flush(2 * time.Second)
+	// if !permission {
+	// 	permission, err = util.CheckPermission("shift_group_member", "READ", *authUserID)
+	// 	if err != nil {
+	// 		sentry.CaptureException(err)
+	// 		defer sentry.Flush(2 * time.Second)
 
-			message = err.Error()
-			status = "error"
+	// 		message = err.Error()
+	// 		status = "error"
 
-			return &model.GetNonShiftGroupMembersResponse{
-				Message: &message,
-				Status:  &status,
-				Result:  nil,
-			}, nil
-		}
-	}
+	// 		return &model.GetNonShiftGroupMembersResponse{
+	// 			Message: &message,
+	// 			Status:  &status,
+	// 			Result:  nil,
+	// 		}, nil
+	// 	}
+	// }
 
-	if !permission {
-		message = "Permission denied: shift_group_member.READ, shift_group_member.READ_ALL"
-		status = "error"
+	// if !permission {
+	// 	message = "Permission denied: shift_group_member.READ, shift_group_member.READ_ALL"
+	// 	status = "error"
 
-		return &model.GetNonShiftGroupMembersResponse{
-			Message: &message,
-			Status:  &status,
-			Result:  nil,
-		}, nil
-	}
+	// 	return &model.GetNonShiftGroupMembersResponse{
+	// 		Message: &message,
+	// 		Status:  &status,
+	// 		Result:  nil,
+	// 	}, nil
+	// }
 
 	if channelID == "" {
 		return nil, fmt.Errorf("channelID is required")
@@ -540,34 +560,34 @@ func (r *queryResolver) GetNonShiftGroupMembers(ctx context.Context, channelID s
 
 // GetShiftGroupMembers is the resolver for the getShiftGroupMembers field.
 func (r *queryResolver) GetShiftGroupMembers(ctx context.Context, shiftGroupID string, channel string, authUserID *string) ([]*model.User, error) {
-	if authUserID == nil || *authUserID == string("") {
-		return nil, fmt.Errorf(AUTH_USER_ID_REQUIRED)
-	}
+	// if authUserID == nil || *authUserID == string("") {
+	// 	return nil, fmt.Errorf(AUTH_USER_ID_REQUIRED)
+	// }
 
 	var err error
-	permission := false
+	// permission := false
 
-	// validate permission
-	permission, err = util.CheckPermission("shift_group_member", "READ_ALL", *authUserID)
-	if err != nil {
-		sentry.CaptureException(err)
-		defer sentry.Flush(2 * time.Second)
+	// // validate permission
+	// permission, err = util.CheckPermission("shift_group_member", "READ_ALL", *authUserID)
+	// if err != nil {
+	// 	sentry.CaptureException(err)
+	// 	defer sentry.Flush(2 * time.Second)
 
-		return nil, err
-	}
+	// 	return nil, err
+	// }
 
-	if !permission {
-		permission, err = util.CheckPermission("shift_group_member", "READ", *authUserID)
-		if err != nil {
-			sentry.CaptureException(err)
-			defer sentry.Flush(2 * time.Second)
+	// if !permission {
+	// 	permission, err = util.CheckPermission("shift_group_member", "READ", *authUserID)
+	// 	if err != nil {
+	// 		sentry.CaptureException(err)
+	// 		defer sentry.Flush(2 * time.Second)
 
-			return nil, err
-		}
-	}
-	if !permission {
-		return nil, fmt.Errorf("Permission denied: shift_group_member.READ, shift_group_member.READ_ALL")
-	}
+	// 		return nil, err
+	// 	}
+	// }
+	// if !permission {
+	// 	return nil, fmt.Errorf("Permission denied: shift_group_member.READ, shift_group_member.READ_ALL")
+	// }
 
 	// validate the input
 	if shiftGroupID == "" {
@@ -624,34 +644,34 @@ func (r *queryResolver) GetShiftGroupMembers(ctx context.Context, shiftGroupID s
 
 // GetAllShiftMembers is the resolver for the getAllShiftMembers field.
 func (r *queryResolver) GetAllShiftMembers(ctx context.Context, first *int, last *int, authUserID *string) ([]*model.User, error) {
-	if authUserID == nil || *authUserID == string("") {
-		return nil, fmt.Errorf(AUTH_USER_ID_REQUIRED)
-	}
+	// if authUserID == nil || *authUserID == string("") {
+	// 	return nil, fmt.Errorf(AUTH_USER_ID_REQUIRED)
+	// }
 
 	var err error
-	permission := false
+	// permission := false
 
-	// validate permission
-	permission, err = util.CheckPermission("shift_group_member", "READ_ALL", *authUserID)
-	if err != nil {
-		sentry.CaptureException(err)
-		defer sentry.Flush(2 * time.Second)
+	// // validate permission
+	// permission, err = util.CheckPermission("shift_group_member", "READ_ALL", *authUserID)
+	// if err != nil {
+	// 	sentry.CaptureException(err)
+	// 	defer sentry.Flush(2 * time.Second)
 
-		return nil, err
-	}
+	// 	return nil, err
+	// }
 
-	if !permission {
-		permission, err = util.CheckPermission("shift_group_member", "READ", *authUserID)
-		if err != nil {
-			sentry.CaptureException(err)
-			defer sentry.Flush(2 * time.Second)
+	// if !permission {
+	// 	permission, err = util.CheckPermission("shift_group_member", "READ", *authUserID)
+	// 	if err != nil {
+	// 		sentry.CaptureException(err)
+	// 		defer sentry.Flush(2 * time.Second)
 
-			return nil, err
-		}
-	}
-	if !permission {
-		return nil, fmt.Errorf("Permission denied: shift_group_member.READ, shift_group_member.READ_ALL")
-	}
+	// 		return nil, err
+	// 	}
+	// }
+	// if !permission {
+	// 	return nil, fmt.Errorf("Permission denied: shift_group_member.READ, shift_group_member.READ_ALL")
+	// }
 
 	var users []*model.User
 
@@ -675,62 +695,62 @@ func (r *queryResolver) GetAllShiftMembers(ctx context.Context, first *int, last
 // GetAllUniqueShifts is the resolver for the getAllUniqueShifts field.
 func (r *queryResolver) GetAllUniqueShifts(ctx context.Context, channelID string, shiftGroupID string, authUserID *string) (*model.GetAllUniqueShiftsResponse, error) {
 	var message, status string
-	if authUserID == nil || *authUserID == string("") {
-		message = AUTH_USER_ID_REQUIRED
-		status = "error"
+	// if authUserID == nil || *authUserID == string("") {
+	// 	message = AUTH_USER_ID_REQUIRED
+	// 	status = "error"
 
-		return &model.GetAllUniqueShiftsResponse{
-			Message: &message,
-			Status:  &status,
-			Result:  nil,
-		}, nil
-	}
+	// 	return &model.GetAllUniqueShiftsResponse{
+	// 		Message: &message,
+	// 		Status:  &status,
+	// 		Result:  nil,
+	// 	}, nil
+	// }
 
 	var err error
-	permission := false
+	// permission := false
 
-	// validate permission
-	permission, err = util.CheckPermission("shift_group_member", "READ_ALL", *authUserID)
-	if err != nil {
-		sentry.CaptureException(err)
-		defer sentry.Flush(2 * time.Second)
+	// // validate permission
+	// permission, err = util.CheckPermission("shift_group_member", "READ_ALL", *authUserID)
+	// if err != nil {
+	// 	sentry.CaptureException(err)
+	// 	defer sentry.Flush(2 * time.Second)
 
-		message = err.Error()
-		status = "error"
+	// 	message = err.Error()
+	// 	status = "error"
 
-		return &model.GetAllUniqueShiftsResponse{
-			Message: &message,
-			Status:  &status,
-			Result:  nil,
-		}, nil
-	}
+	// 	return &model.GetAllUniqueShiftsResponse{
+	// 		Message: &message,
+	// 		Status:  &status,
+	// 		Result:  nil,
+	// 	}, nil
+	// }
 
-	if !permission {
-		permission, err = util.CheckPermission("shift_group_member", "READ", *authUserID)
-		if err != nil {
-			sentry.CaptureException(err)
-			defer sentry.Flush(2 * time.Second)
+	// if !permission {
+	// 	permission, err = util.CheckPermission("shift_group_member", "READ", *authUserID)
+	// 	if err != nil {
+	// 		sentry.CaptureException(err)
+	// 		defer sentry.Flush(2 * time.Second)
 
-			message = err.Error()
-			status = "error"
+	// 		message = err.Error()
+	// 		status = "error"
 
-			return &model.GetAllUniqueShiftsResponse{
-				Message: &message,
-				Status:  &status,
-				Result:  nil,
-			}, nil
-		}
-	}
-	if !permission {
-		message = "Permission denied: shift_group_member.READ, shift_group_member.READ_ALL"
-		status = "error"
+	// 		return &model.GetAllUniqueShiftsResponse{
+	// 			Message: &message,
+	// 			Status:  &status,
+	// 			Result:  nil,
+	// 		}, nil
+	// 	}
+	// }
+	// if !permission {
+	// 	message = "Permission denied: shift_group_member.READ, shift_group_member.READ_ALL"
+	// 	status = "error"
 
-		return &model.GetAllUniqueShiftsResponse{
-			Message: &message,
-			Status:  &status,
-			Result:  nil,
-		}, nil
-	}
+	// 	return &model.GetAllUniqueShiftsResponse{
+	// 		Message: &message,
+	// 		Status:  &status,
+	// 		Result:  nil,
+	// 	}, nil
+	// }
 
 	if channelID == "" {
 		return nil, fmt.Errorf("channelID is required")
@@ -787,63 +807,63 @@ func (r *queryResolver) GetAllUniqueShifts(ctx context.Context, channelID string
 // GetShiftsByPeople is the resolver for the getShiftsByPeople field.
 func (r *queryResolver) GetShiftsByPeople(ctx context.Context, channelID string, endDate time.Time, filter *model.GetShiftsFilter, shiftGroupID string, startDate time.Time, authUserID *string) (*model.GetShiftsResponse, error) {
 	var message, status string
-	if authUserID == nil || *authUserID == string("") {
-		message = AUTH_USER_ID_REQUIRED
-		status = "error"
+	// if authUserID == nil || *authUserID == string("") {
+	// 	message = AUTH_USER_ID_REQUIRED
+	// 	status = "error"
 
-		return &model.GetShiftsResponse{
-			Message: &message,
-			Status:  &status,
-			Result:  nil,
-		}, nil
-	}
+	// 	return &model.GetShiftsResponse{
+	// 		Message: &message,
+	// 		Status:  &status,
+	// 		Result:  nil,
+	// 	}, nil
+	// }
 
 	var err error
-	permission := false
+	// permission := false
 
-	// validate permission
-	permission, err = util.CheckPermission("shift_group_member", "READ_ALL", *authUserID)
-	if err != nil {
-		sentry.CaptureException(err)
-		defer sentry.Flush(2 * time.Second)
+	// // validate permission
+	// permission, err = util.CheckPermission("shift_group_member", "READ_ALL", *authUserID)
+	// if err != nil {
+	// 	sentry.CaptureException(err)
+	// 	defer sentry.Flush(2 * time.Second)
 
-		message = err.Error()
-		status = "error"
+	// 	message = err.Error()
+	// 	status = "error"
 
-		return &model.GetShiftsResponse{
-			Message: &message,
-			Status:  &status,
-			Result:  nil,
-		}, nil
-	}
+	// 	return &model.GetShiftsResponse{
+	// 		Message: &message,
+	// 		Status:  &status,
+	// 		Result:  nil,
+	// 	}, nil
+	// }
 
-	if !permission {
-		permission, err = util.CheckPermission("shift_group_member", "READ", *authUserID)
-		if err != nil {
-			sentry.CaptureException(err)
-			defer sentry.Flush(2 * time.Second)
+	// if !permission {
+	// 	permission, err = util.CheckPermission("shift_group_member", "READ", *authUserID)
+	// 	if err != nil {
+	// 		sentry.CaptureException(err)
+	// 		defer sentry.Flush(2 * time.Second)
 
-			message = err.Error()
-			status = "error"
+	// 		message = err.Error()
+	// 		status = "error"
 
-			return &model.GetShiftsResponse{
-				Message: &message,
-				Status:  &status,
-				Result:  nil,
-			}, nil
-		}
-	}
+	// 		return &model.GetShiftsResponse{
+	// 			Message: &message,
+	// 			Status:  &status,
+	// 			Result:  nil,
+	// 		}, nil
+	// 	}
+	// }
 
-	if !permission {
-		message = "Permission denied: shift_group_member.READ, shift_group_member.READ_ALL"
-		status = "error"
+	// if !permission {
+	// 	message = "Permission denied: shift_group_member.READ, shift_group_member.READ_ALL"
+	// 	status = "error"
 
-		return &model.GetShiftsResponse{
-			Message: &message,
-			Status:  &status,
-			Result:  nil,
-		}, nil
-	}
+	// 	return &model.GetShiftsResponse{
+	// 		Message: &message,
+	// 		Status:  &status,
+	// 		Result:  nil,
+	// 	}, nil
+	// }
 
 	if channelID == "" {
 		return nil, fmt.Errorf("channelID is required")
@@ -1013,6 +1033,7 @@ func (r *queryResolver) GetShiftsByPeople(ctx context.Context, channelID string,
 }
 
 // GetShiftsByTask is the resolver for the getShiftsByTask field.
+// GetShiftsByTask is the resolver for the getShiftsByTask field.
 func (r *queryResolver) GetShiftsByTask(ctx context.Context, channelID string, endDate time.Time, filter *model.GetShiftsFilter, startDate time.Time, authUserID *string) (*model.GetShiftsByTaskResponse, error) {
 	var (
 		// openShifts         []*model.OpenShift
@@ -1023,42 +1044,36 @@ func (r *queryResolver) GetShiftsByTask(ctx context.Context, channelID string, e
 		message string
 		status  string
 	)
-	if authUserID == nil || *authUserID == string("") {
-		message = AUTH_USER_ID_REQUIRED
-		status = "error"
-
-		return util.GetShiftsByTaskHandleError(&message, &status)
-	}
+	// if authUserID == nil || *authUserID == string("") {
+	// 	message = AUTH_USER_ID_REQUIRED
+	// 	status = "error"
+	// 	return util.GetShiftsByTaskHandleError(&message, &status)
+	// }
 
 	var err error
-	permission := false
+	// permission := false
 
-	// validate permission
-	permission, err = util.CheckPermission("shift_group_member", "READ_ALL", *authUserID)
-	if err != nil {
+	// // validate permission
+	// permission, err = util.CheckPermission("shift_group_member", "READ_ALL", *authUserID)
+	// if err != nil {
+	// 	message = err.Error()
+	// 	status = "error"
+	// 	return util.GetShiftsByTaskHandleError(&message, &status)
+	// }
 
-		message = err.Error()
-		status = "error"
-
-		return util.GetShiftsByTaskHandleError(&message, &status)
-	}
-
-	if !permission {
-		permission, err = util.CheckPermission("shift_group_member", "READ", *authUserID)
-		if err != nil {
-
-			message = err.Error()
-			status = "error"
-
-			return util.GetShiftsByTaskHandleError(&message, &status)
-		}
-	}
-	if !permission {
-		message = "Permission denied: shift_group_member.READ, shift_group_member.READ_ALL"
-		status = "error"
-
-		return util.GetShiftsByTaskHandleError(&message, &status)
-	}
+	// if !permission {
+	// 	permission, err = util.CheckPermission("shift_group_member", "READ", *authUserID)
+	// 	if err != nil {
+	// 		message = err.Error()
+	// 		status = "error"
+	// 		return util.GetShiftsByTaskHandleError(&message, &status)
+	// 	}
+	// }
+	// if !permission {
+	// 	message = "Permission denied: shift_group_member.READ, shift_group_member.READ_ALL"
+	// 	status = "error"
+	// 	return util.GetShiftsByTaskHandleError(&message, &status)
+	// }
 
 	if channelID == "" {
 		return nil, fmt.Errorf("channelID is required")
@@ -1072,27 +1087,21 @@ func (r *queryResolver) GetShiftsByTask(ctx context.Context, channelID string, e
 		return nil, fmt.Errorf("startDate is required")
 	}
 
-	var shiftGroups []*model.ShiftGroup
-
 	// get shift groups by channel id
-	shiftGroups, err = util.GetShiftGroups(&channelID, authUserID)
+	shiftGroups, err := util.GetShiftGroups(&channelID, authUserID)
 	if err != nil {
-
 		message = err.Error()
 		status = "error"
-
 		return util.GetShiftsByTaskHandleError(&message, &status)
 	}
 
 	if len(shiftGroups) == 0 {
 		message = "No shift groups found"
 		status = "error"
-
 		return util.GetShiftsByTaskHandleError(&message, &status)
 	}
 
-	// title := "Open shifts"
-	// numberOfHours := 0
+	title := "Open shifts"
 
 	// filter shift groups by id
 	if filter != nil && filter.ShiftGroupIds != nil {
@@ -1107,158 +1116,165 @@ func (r *queryResolver) GetShiftsByTask(ctx context.Context, channelID string, e
 		shiftGroups = result
 	}
 
+	// loop through each shift group
+
 	for _, shiftGroup := range shiftGroups {
+		// retrieve shift group members for the current shift group only
+		var shiftGroupMembers []*model.ShiftGroupMember
 
 		openShifts := []*model.OpenShift{}
 		assignedShifts := []*model.AssignedShift{}
 		userAssignedShifts := []*model.UserAssignedShifts{}
 		numberOfHours := 0
-		title := "Open shifts"
+
+		err = r.DB.Where("channel_id = ? AND shift_group_id = ?", channelID, shiftGroup.ID).Find(&shiftGroupMembers).Error
+		if err != nil {
+			message = err.Error()
+			status = "error"
+			return util.GetShiftsByTaskHandleError(&message, &status)
+		}
 
 		if filter != nil && *filter.IncludeOpenShifts {
-			// get open shifts
-			openShiftsChan := make(chan []*model.OpenShift)
-			var wg sync.WaitGroup
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
-				defer close(openShiftsChan)
-				openShifts, err = util.GetOpenShiftsByTime(&channelID, &shiftGroup.ID, &endDate, &startDate)
-				if err != nil {
-					message = err.Error()
-					status = "error"
-					util.GetShiftsByTaskHandleError(&message, &status)
-					return
-				}
-				openShiftsChan <- openShifts
-			}()
-			timeout := time.After(30 * time.Second) // Set a timeout of 30 seconds
-			select {
-			case openShifts = <-openShiftsChan:
-			// Do something with openShifts
-			case <-timeout:
-				// Handle timeout
-				message = "Timed out while getting open shifts"
+			// retrieve open shifts for the current shift group member only
+			openShifts, err = util.GetOpenShiftsByTime(&channelID, &shiftGroup.ID, &endDate, &startDate)
+			if err != nil {
+				message = err.Error()
 				status = "error"
 				return util.GetShiftsByTaskHandleError(&message, &status)
 			}
-
 		}
 
-		if filter != nil && *filter.IncludeShifts {
-
-			// get ShiftGroupMembers By ChannelId And ShiftGroupId
-			var shiftGroupMembers []*model.ShiftGroupMember
-			err = r.DB.Where("channel_id = ? AND shift_group_id = ?", channelID, shiftGroup.ID).Find(&shiftGroupMembers).Error
+		// filter shift group members by members
+		if filter != nil && filter.ShiftGroupMemberIds != nil {
+			err = r.DB.Where("user_id IN (?) AND shift_group_id = ? AND channel_id = ?", filter.ShiftGroupMemberIds, shiftGroup.ID, channelID).Find(&shiftGroupMembers).Error
 			if err != nil {
 
+				message = err.Error()
+				status = "error"
 				return util.GetShiftsByTaskHandleError(&message, &status)
 			}
+		}
 
-			// filter shift group members by members
-			if filter != nil && filter.ShiftGroupMemberIds != nil {
-				err = r.DB.Where("user_id IN (?) AND shift_group_id = ? AND channel_id = ?", filter.ShiftGroupMemberIds, shiftGroup.ID, channelID).Find(&shiftGroupMembers).Error
-				if err != nil {
+		for _, shiftGroupMember := range shiftGroupMembers {
+			var assignedShiftsTimeOff []*model.TimeOff
 
-					message = err.Error()
-					status = "error"
-					return util.GetShiftsByTaskHandleError(&message, &status)
-				}
-			}
-
-			for _, shiftGroupMember := range shiftGroupMembers {
-				// get assigned shifts
+			if filter != nil && *filter.IncludeShifts {
+				// retrieve assigned shifts for the current shift group member only
 				assignedShifts, err = util.GetAssignedShiftsByTime(&channelID, &shiftGroup.ID, &shiftGroupMember.UserID, &endDate, &startDate)
-				if err != nil {
+				fmt.Println("retrieve assigned shifts for the current shift group member only ", assignedShifts)
 
+				if err != nil {
 					message = err.Error()
 					status = "error"
-
 					return util.GetShiftsByTaskHandleError(&message, &status)
 				}
 
 				for _, assignedShift := range assignedShifts {
 					numberOfHours += util.DiffHours(assignedShift.EndTime, assignedShift.StartTime)
 				}
+			}
 
-				if filter != nil && *filter.IncludeRequests {
-
-					// get requests
-					requests, err = util.GetRequests(&channelID, &shiftGroupMember.UserID, authUserID)
-					if err != nil {
-
-						message = err.Error()
-						status = "error"
-
-						return util.GetShiftsByTaskHandleError(&message, &status)
-
-					}
-
-					for _, request := range requests.Data.GetRequestsByUser.Edges {
-						// add the request to the assignedShifts
-						var newShift *model.AssignedShift
-						if *request.Node.Type != "TIMEOFF" {
-							newShift = &model.AssignedShift{
-								ID:        request.Node.ID,
-								Type:      request.Node.Type,
-								Color:     "GRAY",
-								Note:      request.Node.RequestNote,
-								Is24Hours: request.Node.IsAllDay,
-								StartTime: time.Now(),
-								EndTime:   time.Now(),
-							}
-						} else {
-							newShift = &model.AssignedShift{
-								ID:        request.Node.ID,
-								Type:      request.Node.Type,
-								Color:     "GRAY",
-								Is24Hours: request.Node.IsAllDay,
-								Note:      request.Node.RequestNote,
-								StartTime: request.Node.StartTime,
-								EndTime:   request.Node.EndTime,
-							}
-						}
-						assignedShifts = append(assignedShifts, newShift)
-					}
-				}
-
-				// get the user firstName and lastName from User
-				user, err := util.GetUser(shiftGroupMember.UserID)
+			if filter != nil && *filter.IncludeRequests {
+				// retrieve requests for the current shift group member only
+				requests, err = util.GetRequests(&channelID, &shiftGroupMember.UserID, authUserID)
+				fmt.Println("retrieve requests for the current shift group member only ", requests)
 				if err != nil {
-
 					message = err.Error()
 					status = "error"
-
 					return util.GetShiftsByTaskHandleError(&message, &status)
-				}
 
-				avatar := ""
-				fullName := ""
-				userId := ""
-				if user.ID == shiftGroupMember.UserID {
-					fullName = user.FirstName + " " + user.LastName
-					if user.Avatar == nil {
-						avatar = ""
-					} else {
-						avatar = *user.Avatar
+				}
+				// ------------------------------
+
+				assignedShiftsTimeOff, err = util.GetTimeOffByTime(&channelID, &shiftGroup.ID, &endDate, &startDate, &shiftGroupMember.UserID, authUserID)
+
+				fmt.Println("assignedShiftsTimeOff", assignedShiftsTimeOff)
+				// -------------------------------
+				for _, timeOff := range assignedShiftsTimeOff {
+					taskType := "TIMEOFF"
+					newTimeOff := &model.AssignedShift{
+						ID:           timeOff.ID,
+						StartTime:    timeOff.StartTime,
+						Type:         &taskType,
+						EndTime:      timeOff.EndTime,
+						Label:        &timeOff.Label,
+						Note:         &timeOff.Note,
+						Color:        timeOff.Color,
+						Is24Hours:    timeOff.Is24Hours,
+						UserID:       timeOff.UserID,
+						ChannelID:    timeOff.ChannelID,
+						ShiftGroupID: timeOff.ShiftGroupID,
 					}
-					userId = user.ID
+					fmt.Println("------- ----- ----->>>", timeOff.Label)
+					fmt.Println("------- ----- ----->>>", timeOff.Note)
 
-					userAssignedShifts = append(userAssignedShifts, &model.UserAssignedShifts{
-						UserID:        userId,
-						Name:          fullName,
-						Image:         &avatar,
-						Shifts:        assignedShifts,
-						NumberOfHours: numberOfHours,
-					},
-					)
+					assignedShifts = append(assignedShifts, newTimeOff)
 				}
-			} // end of shiftGroupMembers loop
+				// -------------------------------
 
-		}
+				for _, request := range requests.Data.GetRequestsByUser.Edges {
+					// add the request to the assigned shifts
+					var newShift *model.AssignedShift
+					if *request.Node.Type != "TIMEOFF" {
+						newShift = &model.AssignedShift{
+							ID:        request.Node.ID,
+							Type:      request.Node.Type,
+							Color:     request.Node.ShiftToSwap.Color,
+							Note:      request.Node.RequestNote,
+							Label:     request.Node.ShiftToSwap.Label,
+							Is24Hours: request.Node.IsAllDay,
+							StartTime: request.Node.StartTime,
+							EndTime:   request.Node.EndTime,
+						}
+					} else {
+						newShift = &model.AssignedShift{
+							ID:        request.Node.ID,
+							Type:      request.Node.Type,
+							Label:     request.Node.ShiftToSwap.Label,
+							Color:     request.Node.ShiftToSwap.Color,
+							Is24Hours: request.Node.IsAllDay,
+							Note:      request.Node.RequestNote,
+							StartTime: request.Node.StartTime,
+							EndTime:   request.Node.EndTime,
+						}
+					}
+					assignedShifts = append(assignedShifts, newShift)
+				}
+			}
 
+			// get the user firstName and lastName from User
+			user, err := util.GetUser(shiftGroupMember.UserID)
+			if err != nil {
+				message = err.Error()
+				status = "error"
+				return util.GetShiftsByTaskHandleError(&message, &status)
+			}
+
+			avatar := ""
+			fullName := ""
+			userId := ""
+			if user.ID == shiftGroupMember.UserID {
+				fullName = user.FirstName + " " + user.LastName
+				if user.Avatar == nil {
+					avatar = ""
+				} else {
+					avatar = *user.Avatar
+				}
+				userId = user.ID
+
+				userAssignedShifts = append(userAssignedShifts, &model.UserAssignedShifts{
+					UserID:        userId,
+					Name:          fullName,
+					Image:         &avatar,
+					Shifts:        assignedShifts,
+					NumberOfHours: numberOfHours,
+				})
+			}
+
+		} // end of shiftGroupMembers loop
+		// add shift groups to the result
 		numberOfShifts := len(openShifts)
-		result = append(result, &model.ShiftGroups{
+		shiftGroups := &model.ShiftGroups{
 			GroupID:   shiftGroup.ID,
 			GroupName: shiftGroup.Name,
 			Shifts: &model.Shifts{
@@ -1269,13 +1285,13 @@ func (r *queryResolver) GetShiftsByTask(ctx context.Context, channelID string, e
 					Shifts:         openShifts,
 				},
 			},
-		},
-		)
-	}
+		}
+		result = append(result, shiftGroups)
+
+	} // end of shiftGroups loop
 
 	message = "Fetch successful"
 	status = "success"
-
 	return &model.GetShiftsByTaskResponse{
 		Message: &message,
 		Status:  &status,
@@ -1285,34 +1301,34 @@ func (r *queryResolver) GetShiftsByTask(ctx context.Context, channelID string, e
 
 // GetShiftGroupMembersList is the resolver for the getShiftGroupMembersList field.
 func (r *queryResolver) GetShiftGroupMembersList(ctx context.Context, channelID string, shiftGroupID string, authUserID *string) ([]*model.ShiftGroupMember, error) {
-	if authUserID == nil || *authUserID == string("") {
-		return nil, fmt.Errorf(AUTH_USER_ID_REQUIRED)
-	}
+	// if authUserID == nil || *authUserID == string("") {
+	// 	return nil, fmt.Errorf(AUTH_USER_ID_REQUIRED)
+	// }
 
 	var err error
-	permission := false
+	// permission := false
 
-	// validate permission
-	permission, err = util.CheckPermission("shift_group_member", "READ_ALL", *authUserID)
-	if err != nil {
-		sentry.CaptureException(err)
-		defer sentry.Flush(2 * time.Second)
+	// // validate permission
+	// permission, err = util.CheckPermission("shift_group_member", "READ_ALL", *authUserID)
+	// if err != nil {
+	// 	sentry.CaptureException(err)
+	// 	defer sentry.Flush(2 * time.Second)
 
-		return nil, err
-	}
+	// 	return nil, err
+	// }
 
-	if !permission {
-		permission, err = util.CheckPermission("shift_group_member", "READ", *authUserID)
-		if err != nil {
-			sentry.CaptureException(err)
-			defer sentry.Flush(2 * time.Second)
+	// if !permission {
+	// 	permission, err = util.CheckPermission("shift_group_member", "READ", *authUserID)
+	// 	if err != nil {
+	// 		sentry.CaptureException(err)
+	// 		defer sentry.Flush(2 * time.Second)
 
-			return nil, err
-		}
-	}
-	if !permission {
-		return nil, fmt.Errorf("Permission denied: shift_group_member.READ, shift_group_member.READ_ALL")
-	}
+	// 		return nil, err
+	// 	}
+	// }
+	// if !permission {
+	// 	return nil, fmt.Errorf("Permission denied: shift_group_member.READ, shift_group_member.READ_ALL")
+	// }
 
 	if channelID == "" {
 		return nil, fmt.Errorf("channelID is required")
@@ -1335,6 +1351,46 @@ func (r *queryResolver) GetShiftGroupMembersList(ctx context.Context, channelID 
 	return shiftGroupMembers, nil
 }
 
+// GetTimeOff is the resolver for the getTimeOff field.
+func (r *queryResolver) GetTimeOff(ctx context.Context, id string, authUserID *string) (*model.AssignedShift, error) {
+	panic(fmt.Errorf("not implemented: GetTimeOff - getTimeOff"))
+}
+
+// GetTimeOffs is the resolver for the getTimeOffs field.
+func (r *queryResolver) GetTimeOffs(ctx context.Context, channelID string, shiftGroupID string, userID string, startTime time.Time, endTime time.Time, authUserID *string) ([]*model.AssignedShift, error) {
+	var err error
+	var timeOffs []*model.TimeOff
+	err = r.DB.Where("channel_id = ? AND shift_group_id = ? AND user_id = ? AND start_time >= ? AND end_time <= ?", channelID, shiftGroupID, userID, startTime, endTime).Find(&timeOffs).Error
+	if err != nil {
+		sentry.CaptureException(err)
+		defer sentry.Flush(2 * time.Second)
+
+		return nil, err
+	}
+
+	var assignedShifts []*model.AssignedShift
+	for _, timeOff := range timeOffs {
+		taskType := "timeoff"
+		assignedShift := model.AssignedShift{
+			ID:           timeOff.ID,
+			Type:         &taskType,
+			StartTime:    timeOff.StartTime,
+			EndTime:      timeOff.EndTime,
+			Label:        &timeOff.Label,
+			Note:         &timeOff.Note,
+			Color:        timeOff.Color,
+			Is24Hours:    timeOff.Is24Hours,
+			UserID:       timeOff.UserID,
+			ChannelID:    timeOff.ChannelID,
+			ShiftGroupID: timeOff.ShiftGroupID,
+		}
+
+		assignedShifts = append(assignedShifts, &assignedShift)
+	}
+
+	return assignedShifts, nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
@@ -1343,13 +1399,3 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//     it when you're done.
-//   - You have helper methods in this file. Move them out to keep these resolver files clean.
-const (
-	AUTH_USER_ID_REQUIRED = "Authenticated user id is required"
-)

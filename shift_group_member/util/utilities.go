@@ -315,9 +315,9 @@ func DeleteTimeOff(channelId *string, shiftGroupId *string, userId *string, auth
 	var responseObject model.TimeOffDeleteResponse
 	json.Unmarshal(responseData, &responseObject)
 
-	if responseObject.Data.DeleteTimeOffs == "" {
-		return "Failed to delete time off", nil
-	}
+	// if responseObject.Data.DeleteTimeOffs == "" {
+	// 	return "Failed to delete time off", nil
+	// }
 	return "success", nil
 
 }
@@ -633,6 +633,8 @@ func GetOpenShiftsByTime(channelId *string, shiftGroupId *string, endTime *time.
 	var responseObject model.GetOpenShiftsResponse
 	json.Unmarshal(responseData, &responseObject)
 
+	// fmt.Println("getOpenShiftsByTime = ===>", responseData)
+
 	var openShifts []*model.OpenShift
 
 	// map responseObject into OpenShift struct
@@ -658,6 +660,7 @@ func GetOpenShiftsByTime(channelId *string, shiftGroupId *string, endTime *time.
 
 		var shiftActivities []*model.OpenShiftActivities
 		for _, shiftActivity := range openShift.ShiftActivities {
+
 			shiftActivities = append(shiftActivities, &model.OpenShiftActivities{
 				ID:        shiftActivity.ID,
 				ChannelID: shiftActivity.ChannelID,
@@ -676,6 +679,87 @@ func GetOpenShiftsByTime(channelId *string, shiftGroupId *string, endTime *time.
 
 	return openShifts, nil
 }
+
+// ------------------------------------------ i added
+
+func GetTimeOffByTime(channelId *string, shiftGroupId *string, endTime *time.Time, startTime *time.Time, userId *string, authUserId *string) ([]*model.TimeOff, error) {
+
+	jsonMapInstance := map[string]string{
+		"query": `
+		{
+			getTimeOffs(
+			  channelId: "` + *channelId + `"
+			  shiftGroupId: "` + *shiftGroupId + `"
+			  startTime: "` + fmt.Sprintf("%s", startTime.Format(time.RFC3339)) + `"
+			  endTime: "` + fmt.Sprintf("%s", endTime.Format(time.RFC3339)) + `"
+			  authUserId: "` + *authUserId + `"
+			  userId:  "` + *userId + `"
+			) {
+				id
+				userId
+				channelId
+				shiftGroupId
+				is24Hours
+				startTime
+				endTime
+				label
+				color
+				note
+			  
+			}
+		  }
+		`,
+	}
+	responseData, err := httpRequest("POST", os.Getenv("TIME_OFF_API"), jsonMapInstance)
+	if err != nil {
+		sentry.CaptureException(err)
+		defer sentry.Flush(2 * time.Second)
+
+		fmt.Printf("There was an error executing the request%v", err)
+		return nil, err
+	}
+
+	// convert the responseData to TimeOffDeleteResponse
+	var responseObject model.GetTimeOffResponse
+	json.Unmarshal(responseData, &responseObject)
+
+	var assignedShifts []*model.TimeOff
+	for _, item := range responseObject.Data.GetTimeOffs {
+		var labelText = item.Label
+		var noteText = item.Note
+		fmt.Println("labelText", labelText)
+		fmt.Println("noteText", noteText)
+		// taskType := "USER_TIMEOFF"
+		assignedShifts = append(assignedShifts, &model.TimeOff{
+			ID:           item.ID,
+			StartTime:    item.StartTime,
+			EndTime:      item.EndTime,
+			Label:        labelText,
+			Note:         noteText,
+			Color:        item.Color,
+			Is24Hours:    item.Is24Hours,
+			UserID:       item.UserID,
+			ChannelID:    item.ChannelID,
+			ShiftGroupID: item.ShiftGroupID,
+		})
+
+		// newShift = &model.AssignedShift{
+		// 	ID:        item.ID,
+		// 	Type:      item.Type,
+		// 	Color:     item.Color,
+		// 	Note:      item.Note,
+		// 	Label:     item.Label,
+		// 	Is24Hours: item.Is24Hours,
+		// 	StartTime: item.StartTime,
+		// 	EndTime:   item.EndTime,
+		// }
+
+	}
+
+	return assignedShifts, nil
+}
+
+// ------------------------------------------end i add
 
 func GetAssignedShiftsByTime(channelId *string, shiftGroupId *string, userId *string, endTime *time.Time, startTime *time.Time) ([]*model.AssignedShift, error) {
 
@@ -741,6 +825,7 @@ func GetAssignedShiftsByTime(channelId *string, shiftGroupId *string, userId *st
 			Label:        assignedShift.Label,
 			Note:         assignedShift.Note,
 			StartTime:    assignedShift.StartTime,
+			Color:        assignedShift.Color,
 			UserID:       assignedShift.UserID,
 			ChannelID:    assignedShift.ChannelID,
 			ShiftGroupID: assignedShift.ShiftGroupID,
@@ -779,8 +864,8 @@ func httpRequest(method string, url string, query map[string]string) ([]byte, er
 	newRequest, err := http.NewRequest(method, url, bytes.NewBuffer(jsonResult))
 	if err != nil {
 
-		sentry.CaptureException(err)
-		defer sentry.Flush(2 * time.Second)
+		// sentry.CaptureException(err)
+		// defer sentry.Flush(2 * time.Second)
 
 		fmt.Printf("There was an error creating the new request %v", err)
 		return nil, err
@@ -895,7 +980,7 @@ func GetRequests(channelId *string, userId *string, authUserId *string) (*model.
 			  authUserId: "` + *authUserId + `"
 			) {
 			  edges {
-				node {
+			 {
 				  id
 				  requestId
 				  status

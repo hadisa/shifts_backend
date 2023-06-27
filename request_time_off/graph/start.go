@@ -23,33 +23,33 @@ func run(ctx context.Context) error {
 	defer cancelContextFunc()
 
 	// vault
-	vault, authToken, err := NewVaultAppRoleClient(
-		ctx,
-		VaultParameters{
-			address:                 os.Getenv("VAULT_ADDRESS"),
-			approleRoleID:           os.Getenv("VAULT_APPROLE_ROLE_ID"),
-			approleSecretID:         os.Getenv("VAULT_APPROLE_SECRET_ID"),
-			apiKeyPath:              os.Getenv("VAULT_API_KEY_PATH"),
-			apiKeyMountPath:         os.Getenv("VAULT_API_KEY_MOUNT_PATH"),
-			apiKeyField:             os.Getenv("VAULT_API_KEY_FIELD"),
-			databaseCredentialsPath: os.Getenv("VAULT_DATABASE_CREDS_PATH"),
-		},
-	)
-	if err != nil {
-		sentry.CaptureException(err)
-		defer sentry.Flush(2 * time.Second)
+	// vault, authToken, err := NewVaultAppRoleClient(
+	// 	ctx,
+	// 	VaultParameters{
+	// 		address:                 os.Getenv("VAULT_ADDRESS"),
+	// 		approleRoleID:           os.Getenv("VAULT_APPROLE_ROLE_ID"),
+	// 		approleSecretID:         os.Getenv("VAULT_APPROLE_SECRET_ID"),
+	// 		apiKeyPath:              os.Getenv("VAULT_API_KEY_PATH"),
+	// 		apiKeyMountPath:         os.Getenv("VAULT_API_KEY_MOUNT_PATH"),
+	// 		apiKeyField:             os.Getenv("VAULT_API_KEY_FIELD"),
+	// 		databaseCredentialsPath: os.Getenv("VAULT_DATABASE_CREDS_PATH"),
+	// 	},
+	// )
+	// if err != nil {
+	// 	sentry.CaptureException(err)
+	// 	defer sentry.Flush(2 * time.Second)
 
-		return fmt.Errorf("unable to initialize vault connection : %w", err)
-	}
+	// 	return fmt.Errorf("unable to initialize vault connection : %w", err)
+	// }
 
 	// database
-	databaseCredentials, databaseCredentialsLease, err := vault.GetDatabaseCredentials(ctx)
-	if err != nil {
-		sentry.CaptureException(err)
-		defer sentry.Flush(2 * time.Second)
+	// databaseCredentials, databaseCredentialsLease, err := vault.GetDatabaseCredentials(ctx)
+	// if err != nil {
+	// 	sentry.CaptureException(err)
+	// 	defer sentry.Flush(2 * time.Second)
 
-		return fmt.Errorf("unable to retrieve database credentials from vault: %w", err)
-	}
+	// 	return fmt.Errorf("unable to retrieve database credentials from vault: %w", err)
+	// }
 
 	timeOut, err := strconv.Atoi(os.Getenv("DATABASE_TIMEOUT"))
 	if err != nil {
@@ -66,7 +66,10 @@ func run(ctx context.Context) error {
 			name:     os.Getenv("DATABASE_NAME"),
 			timeout:  time.Duration(timeOut) * time.Second,
 		},
-		databaseCredentials,
+		DatabaseCredentials{
+			Username: "postgres",
+			Password: "12345",
+		},
 	)
 	if err != nil {
 		sentry.CaptureException(err)
@@ -82,10 +85,10 @@ func run(ctx context.Context) error {
 	// start the lease-renewal goroutine & wait for it to finish on exit
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go func() {
-		vault.PeriodicallyRenewLeases(ctx, authToken, databaseCredentialsLease, database.Reconnect)
-		wg.Done()
-	}()
+	// go func() {
+	// 	vault.PeriodicallyRenewLeases(ctx, authToken, databaseCredentialsLease, database.Reconnect)
+	// 	wg.Done()
+	// }()
 	defer func() {
 		cancelContextFunc()
 		wg.Wait()

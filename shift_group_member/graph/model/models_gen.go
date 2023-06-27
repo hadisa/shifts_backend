@@ -162,6 +162,53 @@ type Shifts struct {
 	OpenShifts     *OpenShiftInfo        `json:"openShifts"`
 }
 
+// type ShiftsList struct {
+// 	AssignedShifts []*UserAssignedShifts `json:"assignedShifts"`
+// 	OpenShifts     *OpenShiftInfo        `json:"openShifts"`
+// 	TimeOff         [] *TimeOff          `json:"timeoff`
+// }
+
+type TimeOff struct {
+	ID           string     `json:"id"`
+	UserID       *string    `json:"userId,omitempty"`
+	ChannelID    *string    `json:"channelId,omitempty"`
+	ShiftGroupID *string    `json:"shiftGroupId,omitempty"`
+	StartTime    time.Time  `json:"startTime"`
+	EndTime      time.Time  `json:"endTime"`
+	Is24Hours    bool       `json:"is24Hours"`
+	Label        string     `json:"label"`
+	Color        string     `json:"color"`
+	Note         string     `json:"note"`
+	CreatedAt    *time.Time `json:"createdAt,omitempty"`
+}
+
+type TimeOffAddResponse struct {
+	Errors  []*ShiftError  `json:"errors"`
+	Timeoff *AssignedShift `json:"timeoff,omitempty"`
+}
+
+type TimeOffDeleteResponse struct {
+	Errors  []*ShiftError  `json:"errors"`
+	Timeoff *AssignedShift `json:"timeoff,omitempty"`
+}
+
+type TimeOffEditResponse struct {
+	Errors  []*ShiftError  `json:"errors"`
+	Timeoff *AssignedShift `json:"timeoff,omitempty"`
+}
+
+type TimeOffInput struct {
+	UserID       *string        `json:"userId,omitempty"`
+	ChannelID    *string        `json:"channelId,omitempty"`
+	ShiftGroupID *string        `json:"shiftGroupId,omitempty"`
+	StartTime    time.Time      `json:"startTime"`
+	EndTime      time.Time      `json:"endTime"`
+	Is24Hours    bool           `json:"is24Hours"`
+	Label        string         `json:"label"`
+	Color        ShiftColorEnum `json:"color"`
+	Note         *string        `json:"note,omitempty"`
+}
+
 type UniqueShifts struct {
 	AssignedShifts []*AssignedShift `json:"assignedShifts,omitempty"`
 	OpenShifts     []*OpenShift     `json:"openShifts,omitempty"`
@@ -190,6 +237,79 @@ type UserAssignedShifts struct {
 	NumberOfHours int              `json:"numberOfHours"`
 	Shifts        []*AssignedShift `json:"shifts,omitempty"`
 	UserID        string           `json:"userId"`
+}
+
+type ShiftColorEnum string
+
+const (
+	ShiftColorEnumBlue         ShiftColorEnum = "BLUE"
+	ShiftColorEnumDarkblue     ShiftColorEnum = "DARKBLUE"
+	ShiftColorEnumGreen        ShiftColorEnum = "GREEN"
+	ShiftColorEnumDarkgreen    ShiftColorEnum = "DARKGREEN"
+	ShiftColorEnumDarkcyan     ShiftColorEnum = "DARKCYAN"
+	ShiftColorEnumCyan         ShiftColorEnum = "CYAN"
+	ShiftColorEnumMagenta      ShiftColorEnum = "MAGENTA"
+	ShiftColorEnumDarkmagenta  ShiftColorEnum = "DARKMAGENTA"
+	ShiftColorEnumOrange       ShiftColorEnum = "ORANGE"
+	ShiftColorEnumDarkorange   ShiftColorEnum = "DARKORANGE"
+	ShiftColorEnumGray         ShiftColorEnum = "GRAY"
+	ShiftColorEnumWhite        ShiftColorEnum = "WHITE"
+	ShiftColorEnumYellow       ShiftColorEnum = "YELLOW"
+	ShiftColorEnumLavender     ShiftColorEnum = "LAVENDER"
+	ShiftColorEnumDarklavender ShiftColorEnum = "DARKLAVENDER"
+	ShiftColorEnumRed          ShiftColorEnum = "RED"
+	ShiftColorEnumPink         ShiftColorEnum = "PINK"
+	ShiftColorEnumPurple       ShiftColorEnum = "PURPLE"
+)
+
+var AllShiftColorEnum = []ShiftColorEnum{
+	ShiftColorEnumBlue,
+	ShiftColorEnumDarkblue,
+	ShiftColorEnumGreen,
+	ShiftColorEnumDarkgreen,
+	ShiftColorEnumDarkcyan,
+	ShiftColorEnumCyan,
+	ShiftColorEnumMagenta,
+	ShiftColorEnumDarkmagenta,
+	ShiftColorEnumOrange,
+	ShiftColorEnumDarkorange,
+	ShiftColorEnumGray,
+	ShiftColorEnumWhite,
+	ShiftColorEnumYellow,
+	ShiftColorEnumLavender,
+	ShiftColorEnumDarklavender,
+	ShiftColorEnumRed,
+	ShiftColorEnumPink,
+	ShiftColorEnumPurple,
+}
+
+func (e ShiftColorEnum) IsValid() bool {
+	switch e {
+	case ShiftColorEnumBlue, ShiftColorEnumDarkblue, ShiftColorEnumGreen, ShiftColorEnumDarkgreen, ShiftColorEnumDarkcyan, ShiftColorEnumCyan, ShiftColorEnumMagenta, ShiftColorEnumDarkmagenta, ShiftColorEnumOrange, ShiftColorEnumDarkorange, ShiftColorEnumGray, ShiftColorEnumWhite, ShiftColorEnumYellow, ShiftColorEnumLavender, ShiftColorEnumDarklavender, ShiftColorEnumRed, ShiftColorEnumPink, ShiftColorEnumPurple:
+		return true
+	}
+	return false
+}
+
+func (e ShiftColorEnum) String() string {
+	return string(e)
+}
+
+func (e *ShiftColorEnum) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ShiftColorEnum(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ShiftColorEnum", str)
+	}
+	return nil
+}
+
+func (e ShiftColorEnum) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
 type ShiftErrorCode string

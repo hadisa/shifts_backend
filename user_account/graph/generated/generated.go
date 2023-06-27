@@ -7103,58 +7103,65 @@ func (ec *executionContext) unmarshalInputAccountInput(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("firstName"))
-			it.FirstName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.FirstName = data
 		case "lastName":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lastName"))
-			it.LastName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.LastName = data
 		case "phone":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("phone"))
-			it.Phone, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Phone = data
 		case "whatsapp":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("whatsapp"))
-			it.Whatsapp, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Whatsapp = data
 		case "languageCode":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("languageCode"))
-			it.LanguageCode, err = ec.unmarshalOLanguageCodeEnum2ᚖaccount_userᚋgraphᚋmodelᚐLanguageCodeEnum(ctx, v)
+			data, err := ec.unmarshalOLanguageCodeEnum2ᚖaccount_userᚋgraphᚋmodelᚐLanguageCodeEnum(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.LanguageCode = data
 		case "defaultBillingAddress":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("defaultBillingAddress"))
-			it.DefaultBillingAddress, err = ec.unmarshalOAddressInput2ᚖaccount_userᚋgraphᚋmodelᚐAddressInput(ctx, v)
+			data, err := ec.unmarshalOAddressInput2ᚖaccount_userᚋgraphᚋmodelᚐAddressInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.DefaultBillingAddress = data
 		case "defaultShippingAddress":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("defaultShippingAddress"))
-			it.DefaultShippingAddress, err = ec.unmarshalOAddressInput2ᚖaccount_userᚋgraphᚋmodelᚐAddressInput(ctx, v)
+			data, err := ec.unmarshalOAddressInput2ᚖaccount_userᚋgraphᚋmodelᚐAddressInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.DefaultShippingAddress = data
 		}
 	}
 
@@ -7179,82 +7186,92 @@ func (ec *executionContext) unmarshalInputAccountRegisterInput(ctx context.Conte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("identityId"))
-			it.IdentityID, err = ec.unmarshalNID2string(ctx, v)
+			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.IdentityID = data
 		case "firstName":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("firstName"))
-			it.FirstName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.FirstName = data
 		case "lastName":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lastName"))
-			it.LastName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.LastName = data
 		case "phone":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("phone"))
-			it.Phone, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Phone = data
 		case "whatsapp":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("whatsapp"))
-			it.Whatsapp, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Whatsapp = data
 		case "languageCode":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("languageCode"))
-			it.LanguageCode, err = ec.unmarshalOLanguageCodeEnum2ᚖaccount_userᚋgraphᚋmodelᚐLanguageCodeEnum(ctx, v)
+			data, err := ec.unmarshalOLanguageCodeEnum2ᚖaccount_userᚋgraphᚋmodelᚐLanguageCodeEnum(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.LanguageCode = data
 		case "email":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			it.Email, err = ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Email = data
 		case "password":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			it.Password, err = ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Password = data
 		case "redirectUrl":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("redirectUrl"))
-			it.RedirectURL, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.RedirectURL = data
 		case "channel":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("channel"))
-			it.Channel, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Channel = data
 		}
 	}
 
@@ -7279,90 +7296,101 @@ func (ec *executionContext) unmarshalInputAddressInput(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("firstName"))
-			it.FirstName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.FirstName = data
 		case "lastName":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lastName"))
-			it.LastName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.LastName = data
 		case "companyName":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("companyName"))
-			it.CompanyName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CompanyName = data
 		case "streetAddress1":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("streetAddress1"))
-			it.StreetAddress1, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.StreetAddress1 = data
 		case "streetAddress2":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("streetAddress2"))
-			it.StreetAddress2, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.StreetAddress2 = data
 		case "city":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("city"))
-			it.City, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.City = data
 		case "cityArea":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cityArea"))
-			it.CityArea, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CityArea = data
 		case "postalCode":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("postalCode"))
-			it.PostalCode, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.PostalCode = data
 		case "country":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("country"))
-			it.Country, err = ec.unmarshalOCountryCode2ᚖaccount_userᚋgraphᚋmodelᚐCountryCode(ctx, v)
+			data, err := ec.unmarshalOCountryCode2ᚖaccount_userᚋgraphᚋmodelᚐCountryCode(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Country = data
 		case "countryArea":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("countryArea"))
-			it.CountryArea, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CountryArea = data
 		case "phone":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("phone"))
-			it.Phone, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Phone = data
 		}
 	}
 

@@ -68,7 +68,7 @@ func CreateRequest(channelId *string, userId *string) (string, error) {
 			  channelId: "` + *channelId + `"
 			  userId: "` + *userId + `"
 			  recipientId: "-1"
-			  type: "requestOffer"
+			  type: "requestSwap"
 			}) {
 			  id
 			}

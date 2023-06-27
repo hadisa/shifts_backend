@@ -69,11 +69,17 @@ func (db *Database) Reconnect(ctx context.Context, credentials DatabaseCredentia
 
 	connectionString := fmt.Sprintf(
 		"host=%s port=%s dbname=%s user=%s password=%s sslmode=disable",
-		db.parameters.hostname,
-		db.parameters.port,
-		db.parameters.name,
-		credentials.Username,
-		credentials.Password,
+		"192.168.20.238",
+		"5432",
+		"user_account",
+		"postgres",
+		"12345",
+		// db.parameters.hostname,
+		// db.parameters.port,
+		// db.parameters.name,
+		// credentials.Username,
+		// credentials.Password,
+
 	)
 
 	connection, err := gorm.Open(postgres.Open(connectionString), &gorm.Config{

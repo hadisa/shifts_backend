@@ -109,6 +109,29 @@ getRequestTimeOffsByChannelIdRequestId(channelId: ID!, requestId: ID!): RequestT
 
 This query returns a single RequestTimeOff object based on the provided channelId and requestId.
 
+```graphql
+query getRequestTimeOffsByChannelIdRequestId(
+$channelId: ID!
+$requestId: ID!
+){
+  getRequestTimeOffsByChannelIdRequestId(
+    channelId:$channelId 
+    requestId: $requestId){
+    userId
+    requestId
+    reason
+    responseNote
+  }
+}
+```
+
+
+```json
+{
+   "channelId": "1bf3e83c-b976-413d-b095-6bea7e9c5651",
+   "requestId": "9c355b5a-d33a-44a5-b811-425e13c3dfc3"
+}
+```
 ### Mutation
 
 #### createRequestTimeOff

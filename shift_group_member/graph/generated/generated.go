@@ -107,9 +107,13 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
+		CreateTimeOff            func(childComplexity int, input model.TimeOffInput, authUserID *string) int
+		DeleteTimeOff            func(childComplexity int, id string, authUserID *string) int
+		DeleteTimeOffs           func(childComplexity int, channelID string, shiftGroupID string, userID string, authUserID *string) int
 		ShiftGroupMemberAdd      func(childComplexity int, input model.ShiftGroupMemberInput, authUserID *string) int
 		ShiftGroupMemberRemove   func(childComplexity int, channelID string, shiftGroupID string, userID string, authUserID *string) int
 		ShiftGroupMembersReorder func(childComplexity int, channelID *string, shiftGroupID string, userIds []string, authUserID *string) int
+		UpdateTimeOff            func(childComplexity int, id string, input model.TimeOffInput, authUserID *string) int
 	}
 
 	OpenShift struct {
@@ -156,6 +160,8 @@ type ComplexityRoot struct {
 		GetShiftGroupMembersList func(childComplexity int, channelID string, shiftGroupID string, authUserID *string) int
 		GetShiftsByPeople        func(childComplexity int, channelID string, endDate time.Time, filter *model.GetShiftsFilter, shiftGroupID string, startDate time.Time, authUserID *string) int
 		GetShiftsByTask          func(childComplexity int, channelID string, endDate time.Time, filter *model.GetShiftsFilter, startDate time.Time, authUserID *string) int
+		GetTimeOff               func(childComplexity int, id string, authUserID *string) int
+		GetTimeOffs              func(childComplexity int, channelID string, shiftGroupID string, userID string, startTime time.Time, endTime time.Time, authUserID *string) int
 	}
 
 	ResponseStatus struct {
@@ -200,6 +206,35 @@ type ComplexityRoot struct {
 		OpenShifts     func(childComplexity int) int
 	}
 
+	TimeOff struct {
+		ChannelID    func(childComplexity int) int
+		Color        func(childComplexity int) int
+		CreatedAt    func(childComplexity int) int
+		EndTime      func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Is24Hours    func(childComplexity int) int
+		Label        func(childComplexity int) int
+		Note         func(childComplexity int) int
+		ShiftGroupID func(childComplexity int) int
+		StartTime    func(childComplexity int) int
+		UserID       func(childComplexity int) int
+	}
+
+	TimeOffAddResponse struct {
+		Errors  func(childComplexity int) int
+		Timeoff func(childComplexity int) int
+	}
+
+	TimeOffDeleteResponse struct {
+		Errors  func(childComplexity int) int
+		Timeoff func(childComplexity int) int
+	}
+
+	TimeOffEditResponse struct {
+		Errors  func(childComplexity int) int
+		Timeoff func(childComplexity int) int
+	}
+
 	UniqueShifts struct {
 		AssignedShifts func(childComplexity int) int
 		OpenShifts     func(childComplexity int) int
@@ -235,6 +270,10 @@ type MutationResolver interface {
 	ShiftGroupMemberAdd(ctx context.Context, input model.ShiftGroupMemberInput, authUserID *string) (*model.ShiftGroupMemberAddResponse, error)
 	ShiftGroupMembersReorder(ctx context.Context, channelID *string, shiftGroupID string, userIds []string, authUserID *string) (*model.ResponseStatus, error)
 	ShiftGroupMemberRemove(ctx context.Context, channelID string, shiftGroupID string, userID string, authUserID *string) (*model.ShiftGroupMemberRemoveResponse, error)
+	CreateTimeOff(ctx context.Context, input model.TimeOffInput, authUserID *string) (*model.TimeOffAddResponse, error)
+	UpdateTimeOff(ctx context.Context, id string, input model.TimeOffInput, authUserID *string) (*model.TimeOffEditResponse, error)
+	DeleteTimeOff(ctx context.Context, id string, authUserID *string) (*model.TimeOffDeleteResponse, error)
+	DeleteTimeOffs(ctx context.Context, channelID string, shiftGroupID string, userID string, authUserID *string) (string, error)
 }
 type QueryResolver interface {
 	GetNonShiftGroupMembers(ctx context.Context, channelID string, shiftGroupID string, authUserID *string) (*model.GetNonShiftGroupMembersResponse, error)
@@ -244,6 +283,8 @@ type QueryResolver interface {
 	GetShiftsByPeople(ctx context.Context, channelID string, endDate time.Time, filter *model.GetShiftsFilter, shiftGroupID string, startDate time.Time, authUserID *string) (*model.GetShiftsResponse, error)
 	GetShiftsByTask(ctx context.Context, channelID string, endDate time.Time, filter *model.GetShiftsFilter, startDate time.Time, authUserID *string) (*model.GetShiftsByTaskResponse, error)
 	GetShiftGroupMembersList(ctx context.Context, channelID string, shiftGroupID string, authUserID *string) ([]*model.ShiftGroupMember, error)
+	GetTimeOff(ctx context.Context, id string, authUserID *string) (*model.AssignedShift, error)
+	GetTimeOffs(ctx context.Context, channelID string, shiftGroupID string, userID string, startTime time.Time, endTime time.Time, authUserID *string) ([]*model.AssignedShift, error)
 }
 
 type executableSchema struct {
@@ -562,6 +603,42 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.GetShiftsResponse.Status(childComplexity), true
 
+	case "Mutation.createTimeOff":
+		if e.complexity.Mutation.CreateTimeOff == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createTimeOff_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateTimeOff(childComplexity, args["input"].(model.TimeOffInput), args["authUserId"].(*string)), true
+
+	case "Mutation.deleteTimeOff":
+		if e.complexity.Mutation.DeleteTimeOff == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteTimeOff_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteTimeOff(childComplexity, args["id"].(string), args["authUserId"].(*string)), true
+
+	case "Mutation.deleteTimeOffs":
+		if e.complexity.Mutation.DeleteTimeOffs == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteTimeOffs_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteTimeOffs(childComplexity, args["channelId"].(string), args["shiftGroupId"].(string), args["userId"].(string), args["authUserId"].(*string)), true
+
 	case "Mutation.shiftGroupMemberAdd":
 		if e.complexity.Mutation.ShiftGroupMemberAdd == nil {
 			break
@@ -597,6 +674,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.ShiftGroupMembersReorder(childComplexity, args["channelId"].(*string), args["shiftGroupId"].(string), args["userIds"].([]string), args["authUserId"].(*string)), true
+
+	case "Mutation.updateTimeOff":
+		if e.complexity.Mutation.UpdateTimeOff == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateTimeOff_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateTimeOff(childComplexity, args["id"].(string), args["input"].(model.TimeOffInput), args["authUserId"].(*string)), true
 
 	case "OpenShift.break":
 		if e.complexity.OpenShift.Break == nil {
@@ -871,6 +960,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.GetShiftsByTask(childComplexity, args["channelId"].(string), args["endDate"].(time.Time), args["filter"].(*model.GetShiftsFilter), args["startDate"].(time.Time), args["authUserId"].(*string)), true
 
+	case "Query.getTimeOff":
+		if e.complexity.Query.GetTimeOff == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getTimeOff_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetTimeOff(childComplexity, args["id"].(string), args["authUserId"].(*string)), true
+
+	case "Query.getTimeOffs":
+		if e.complexity.Query.GetTimeOffs == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getTimeOffs_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetTimeOffs(childComplexity, args["channelId"].(string), args["shiftGroupId"].(string), args["userId"].(string), args["startTime"].(time.Time), args["endTime"].(time.Time), args["authUserId"].(*string)), true
+
 	case "ResponseStatus.message":
 		if e.complexity.ResponseStatus.Message == nil {
 			break
@@ -1017,6 +1130,125 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Shifts.OpenShifts(childComplexity), true
+
+	case "TimeOff.channelId":
+		if e.complexity.TimeOff.ChannelID == nil {
+			break
+		}
+
+		return e.complexity.TimeOff.ChannelID(childComplexity), true
+
+	case "TimeOff.color":
+		if e.complexity.TimeOff.Color == nil {
+			break
+		}
+
+		return e.complexity.TimeOff.Color(childComplexity), true
+
+	case "TimeOff.createdAt":
+		if e.complexity.TimeOff.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.TimeOff.CreatedAt(childComplexity), true
+
+	case "TimeOff.endTime":
+		if e.complexity.TimeOff.EndTime == nil {
+			break
+		}
+
+		return e.complexity.TimeOff.EndTime(childComplexity), true
+
+	case "TimeOff.id":
+		if e.complexity.TimeOff.ID == nil {
+			break
+		}
+
+		return e.complexity.TimeOff.ID(childComplexity), true
+
+	case "TimeOff.is24Hours":
+		if e.complexity.TimeOff.Is24Hours == nil {
+			break
+		}
+
+		return e.complexity.TimeOff.Is24Hours(childComplexity), true
+
+	case "TimeOff.label":
+		if e.complexity.TimeOff.Label == nil {
+			break
+		}
+
+		return e.complexity.TimeOff.Label(childComplexity), true
+
+	case "TimeOff.note":
+		if e.complexity.TimeOff.Note == nil {
+			break
+		}
+
+		return e.complexity.TimeOff.Note(childComplexity), true
+
+	case "TimeOff.shiftGroupId":
+		if e.complexity.TimeOff.ShiftGroupID == nil {
+			break
+		}
+
+		return e.complexity.TimeOff.ShiftGroupID(childComplexity), true
+
+	case "TimeOff.startTime":
+		if e.complexity.TimeOff.StartTime == nil {
+			break
+		}
+
+		return e.complexity.TimeOff.StartTime(childComplexity), true
+
+	case "TimeOff.userId":
+		if e.complexity.TimeOff.UserID == nil {
+			break
+		}
+
+		return e.complexity.TimeOff.UserID(childComplexity), true
+
+	case "TimeOffAddResponse.errors":
+		if e.complexity.TimeOffAddResponse.Errors == nil {
+			break
+		}
+
+		return e.complexity.TimeOffAddResponse.Errors(childComplexity), true
+
+	case "TimeOffAddResponse.timeoff":
+		if e.complexity.TimeOffAddResponse.Timeoff == nil {
+			break
+		}
+
+		return e.complexity.TimeOffAddResponse.Timeoff(childComplexity), true
+
+	case "TimeOffDeleteResponse.errors":
+		if e.complexity.TimeOffDeleteResponse.Errors == nil {
+			break
+		}
+
+		return e.complexity.TimeOffDeleteResponse.Errors(childComplexity), true
+
+	case "TimeOffDeleteResponse.timeoff":
+		if e.complexity.TimeOffDeleteResponse.Timeoff == nil {
+			break
+		}
+
+		return e.complexity.TimeOffDeleteResponse.Timeoff(childComplexity), true
+
+	case "TimeOffEditResponse.errors":
+		if e.complexity.TimeOffEditResponse.Errors == nil {
+			break
+		}
+
+		return e.complexity.TimeOffEditResponse.Errors(childComplexity), true
+
+	case "TimeOffEditResponse.timeoff":
+		if e.complexity.TimeOffEditResponse.Timeoff == nil {
+			break
+		}
+
+		return e.complexity.TimeOffEditResponse.Timeoff(childComplexity), true
 
 	case "UniqueShifts.assignedShifts":
 		if e.complexity.UniqueShifts.AssignedShifts == nil {
@@ -1175,6 +1407,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputGetShiftsFilter,
 		ec.unmarshalInputShiftGroupMemberInput,
+		ec.unmarshalInputTimeOffInput,
 	)
 	first := true
 
@@ -1410,12 +1643,6 @@ type ShiftGroupMemberRemoveResponse {
   user: User
 }
 
-type ShiftError {
-  code: ShiftErrorCode!
-  field: String
-  message: String
-}
-
 enum ShiftErrorCode {
   GRAPHQL_ERROR
   INVALID
@@ -1465,6 +1692,16 @@ type Query {
     shiftGroupId: ID!
     authUserId: ID
   ): [ShiftGroupMember]!
+
+  getTimeOff(id: ID!, authUserId: ID): AssignedShift!
+  getTimeOffs(
+    channelId: ID!
+    shiftGroupId: ID!
+    userId: ID!
+    startTime: Time!
+    endTime: Time!
+    authUserId: ID
+  ): [AssignedShift!]!
 }
 
 type Mutation {
@@ -1484,6 +1721,88 @@ type Mutation {
     userId: ID!
     authUserId: ID
   ): ShiftGroupMemberRemoveResponse
+
+  createTimeOff(input: TimeOffInput!, authUserId: ID): TimeOffAddResponse
+  updateTimeOff(
+    id: ID!
+    input: TimeOffInput!
+    authUserId: ID
+  ): TimeOffEditResponse
+  deleteTimeOff(id: ID!, authUserId: ID): TimeOffDeleteResponse
+  deleteTimeOffs(
+    channelId: ID!
+    shiftGroupId: ID!
+    userId: ID!
+    authUserId: ID
+  ): String!
+}
+
+type TimeOff {
+  id: ID!
+  userId: ID
+  channelId: ID
+  shiftGroupId: ID
+  startTime: Time!
+  endTime: Time!
+  is24Hours: Boolean!
+  label: String!
+  color: String!
+  note: String!
+  createdAt: Time
+}
+
+input TimeOffInput {
+  userId: ID
+  channelId: ID
+  shiftGroupId: ID
+  startTime: Time!
+  endTime: Time!
+  is24Hours: Boolean!
+  label: String!
+  color: ShiftColorEnum!
+  note: String
+}
+
+type TimeOffAddResponse {
+  errors: [ShiftError!]!
+  timeoff: AssignedShift
+}
+
+type TimeOffEditResponse {
+  errors: [ShiftError!]!
+  timeoff: AssignedShift
+}
+
+type TimeOffDeleteResponse {
+  errors: [ShiftError!]!
+  timeoff: AssignedShift
+}
+
+type ShiftError {
+  code: ShiftErrorCode!
+  field: String
+  message: String
+}
+
+enum ShiftColorEnum {
+  BLUE
+  DARKBLUE
+  GREEN
+  DARKGREEN
+  DARKCYAN
+  CYAN
+  MAGENTA
+  DARKMAGENTA
+  ORANGE
+  DARKORANGE
+  GRAY
+  WHITE
+  YELLOW
+  LAVENDER
+  DARKLAVENDER
+  RED
+  PINK
+  PURPLE
 }
 `, BuiltIn: false},
 }
@@ -1492,6 +1811,96 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_createTimeOff_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.TimeOffInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNTimeOffInput2shift_group_membersᚋgraphᚋmodelᚐTimeOffInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	var arg1 *string
+	if tmp, ok := rawArgs["authUserId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authUserId"))
+		arg1, err = ec.unmarshalOID2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["authUserId"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteTimeOff_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 *string
+	if tmp, ok := rawArgs["authUserId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authUserId"))
+		arg1, err = ec.unmarshalOID2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["authUserId"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteTimeOffs_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["channelId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("channelId"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["channelId"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["shiftGroupId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("shiftGroupId"))
+		arg1, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["shiftGroupId"] = arg1
+	var arg2 string
+	if tmp, ok := rawArgs["userId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
+		arg2, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["userId"] = arg2
+	var arg3 *string
+	if tmp, ok := rawArgs["authUserId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authUserId"))
+		arg3, err = ec.unmarshalOID2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["authUserId"] = arg3
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_shiftGroupMemberAdd_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -1598,6 +2007,39 @@ func (ec *executionContext) field_Mutation_shiftGroupMembersReorder_args(ctx con
 		}
 	}
 	args["authUserId"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateTimeOff_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 model.TimeOffInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalNTimeOffInput2shift_group_membersᚋgraphᚋmodelᚐTimeOffInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
+	var arg2 *string
+	if tmp, ok := rawArgs["authUserId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authUserId"))
+		arg2, err = ec.unmarshalOID2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["authUserId"] = arg2
 	return args, nil
 }
 
@@ -1889,6 +2331,90 @@ func (ec *executionContext) field_Query_getShiftsByTask_args(ctx context.Context
 		}
 	}
 	args["authUserId"] = arg4
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getTimeOff_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 *string
+	if tmp, ok := rawArgs["authUserId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authUserId"))
+		arg1, err = ec.unmarshalOID2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["authUserId"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getTimeOffs_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["channelId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("channelId"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["channelId"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["shiftGroupId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("shiftGroupId"))
+		arg1, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["shiftGroupId"] = arg1
+	var arg2 string
+	if tmp, ok := rawArgs["userId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
+		arg2, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["userId"] = arg2
+	var arg3 time.Time
+	if tmp, ok := rawArgs["startTime"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("startTime"))
+		arg3, err = ec.unmarshalNTime2timeᚐTime(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["startTime"] = arg3
+	var arg4 time.Time
+	if tmp, ok := rawArgs["endTime"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("endTime"))
+		arg4, err = ec.unmarshalNTime2timeᚐTime(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["endTime"] = arg4
+	var arg5 *string
+	if tmp, ok := rawArgs["authUserId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authUserId"))
+		arg5, err = ec.unmarshalOID2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["authUserId"] = arg5
 	return args, nil
 }
 
@@ -4104,6 +4630,235 @@ func (ec *executionContext) fieldContext_Mutation_shiftGroupMemberRemove(ctx con
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_createTimeOff(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createTimeOff(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateTimeOff(rctx, fc.Args["input"].(model.TimeOffInput), fc.Args["authUserId"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.TimeOffAddResponse)
+	fc.Result = res
+	return ec.marshalOTimeOffAddResponse2ᚖshift_group_membersᚋgraphᚋmodelᚐTimeOffAddResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createTimeOff(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "errors":
+				return ec.fieldContext_TimeOffAddResponse_errors(ctx, field)
+			case "timeoff":
+				return ec.fieldContext_TimeOffAddResponse_timeoff(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TimeOffAddResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createTimeOff_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateTimeOff(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateTimeOff(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateTimeOff(rctx, fc.Args["id"].(string), fc.Args["input"].(model.TimeOffInput), fc.Args["authUserId"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.TimeOffEditResponse)
+	fc.Result = res
+	return ec.marshalOTimeOffEditResponse2ᚖshift_group_membersᚋgraphᚋmodelᚐTimeOffEditResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateTimeOff(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "errors":
+				return ec.fieldContext_TimeOffEditResponse_errors(ctx, field)
+			case "timeoff":
+				return ec.fieldContext_TimeOffEditResponse_timeoff(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TimeOffEditResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateTimeOff_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteTimeOff(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteTimeOff(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteTimeOff(rctx, fc.Args["id"].(string), fc.Args["authUserId"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.TimeOffDeleteResponse)
+	fc.Result = res
+	return ec.marshalOTimeOffDeleteResponse2ᚖshift_group_membersᚋgraphᚋmodelᚐTimeOffDeleteResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteTimeOff(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "errors":
+				return ec.fieldContext_TimeOffDeleteResponse_errors(ctx, field)
+			case "timeoff":
+				return ec.fieldContext_TimeOffDeleteResponse_timeoff(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TimeOffDeleteResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteTimeOff_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteTimeOffs(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteTimeOffs(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteTimeOffs(rctx, fc.Args["channelId"].(string), fc.Args["shiftGroupId"].(string), fc.Args["userId"].(string), fc.Args["authUserId"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteTimeOffs(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteTimeOffs_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _OpenShift_id(ctx context.Context, field graphql.CollectedField, obj *model.OpenShift) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_OpenShift_id(ctx, field)
 	if err != nil {
@@ -5772,6 +6527,196 @@ func (ec *executionContext) fieldContext_Query_getShiftGroupMembersList(ctx cont
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_getTimeOff(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getTimeOff(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetTimeOff(rctx, fc.Args["id"].(string), fc.Args["authUserId"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.AssignedShift)
+	fc.Result = res
+	return ec.marshalNAssignedShift2ᚖshift_group_membersᚋgraphᚋmodelᚐAssignedShift(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getTimeOff(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_AssignedShift_id(ctx, field)
+			case "break":
+				return ec.fieldContext_AssignedShift_break(ctx, field)
+			case "color":
+				return ec.fieldContext_AssignedShift_color(ctx, field)
+			case "startTime":
+				return ec.fieldContext_AssignedShift_startTime(ctx, field)
+			case "endTime":
+				return ec.fieldContext_AssignedShift_endTime(ctx, field)
+			case "is24Hours":
+				return ec.fieldContext_AssignedShift_is24Hours(ctx, field)
+			case "label":
+				return ec.fieldContext_AssignedShift_label(ctx, field)
+			case "note":
+				return ec.fieldContext_AssignedShift_note(ctx, field)
+			case "shiftToOffer":
+				return ec.fieldContext_AssignedShift_shiftToOffer(ctx, field)
+			case "shiftToSwap":
+				return ec.fieldContext_AssignedShift_shiftToSwap(ctx, field)
+			case "toSwapWith":
+				return ec.fieldContext_AssignedShift_toSwapWith(ctx, field)
+			case "userId":
+				return ec.fieldContext_AssignedShift_userId(ctx, field)
+			case "channelId":
+				return ec.fieldContext_AssignedShift_channelId(ctx, field)
+			case "shiftGroupId":
+				return ec.fieldContext_AssignedShift_shiftGroupId(ctx, field)
+			case "type":
+				return ec.fieldContext_AssignedShift_type(ctx, field)
+			case "isOpen":
+				return ec.fieldContext_AssignedShift_isOpen(ctx, field)
+			case "isShared":
+				return ec.fieldContext_AssignedShift_isShared(ctx, field)
+			case "ShiftActivities":
+				return ec.fieldContext_AssignedShift_ShiftActivities(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_AssignedShift_createdAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AssignedShift", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getTimeOff_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getTimeOffs(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getTimeOffs(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetTimeOffs(rctx, fc.Args["channelId"].(string), fc.Args["shiftGroupId"].(string), fc.Args["userId"].(string), fc.Args["startTime"].(time.Time), fc.Args["endTime"].(time.Time), fc.Args["authUserId"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.AssignedShift)
+	fc.Result = res
+	return ec.marshalNAssignedShift2ᚕᚖshift_group_membersᚋgraphᚋmodelᚐAssignedShiftᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getTimeOffs(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_AssignedShift_id(ctx, field)
+			case "break":
+				return ec.fieldContext_AssignedShift_break(ctx, field)
+			case "color":
+				return ec.fieldContext_AssignedShift_color(ctx, field)
+			case "startTime":
+				return ec.fieldContext_AssignedShift_startTime(ctx, field)
+			case "endTime":
+				return ec.fieldContext_AssignedShift_endTime(ctx, field)
+			case "is24Hours":
+				return ec.fieldContext_AssignedShift_is24Hours(ctx, field)
+			case "label":
+				return ec.fieldContext_AssignedShift_label(ctx, field)
+			case "note":
+				return ec.fieldContext_AssignedShift_note(ctx, field)
+			case "shiftToOffer":
+				return ec.fieldContext_AssignedShift_shiftToOffer(ctx, field)
+			case "shiftToSwap":
+				return ec.fieldContext_AssignedShift_shiftToSwap(ctx, field)
+			case "toSwapWith":
+				return ec.fieldContext_AssignedShift_toSwapWith(ctx, field)
+			case "userId":
+				return ec.fieldContext_AssignedShift_userId(ctx, field)
+			case "channelId":
+				return ec.fieldContext_AssignedShift_channelId(ctx, field)
+			case "shiftGroupId":
+				return ec.fieldContext_AssignedShift_shiftGroupId(ctx, field)
+			case "type":
+				return ec.fieldContext_AssignedShift_type(ctx, field)
+			case "isOpen":
+				return ec.fieldContext_AssignedShift_isOpen(ctx, field)
+			case "isShared":
+				return ec.fieldContext_AssignedShift_isShared(ctx, field)
+			case "ShiftActivities":
+				return ec.fieldContext_AssignedShift_ShiftActivities(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_AssignedShift_createdAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AssignedShift", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getTimeOffs_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query___type(ctx, field)
 	if err != nil {
@@ -6895,6 +7840,877 @@ func (ec *executionContext) fieldContext_Shifts_openShifts(ctx context.Context, 
 				return ec.fieldContext_OpenShiftInfo_title(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type OpenShiftInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TimeOff_id(ctx context.Context, field graphql.CollectedField, obj *model.TimeOff) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TimeOff_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TimeOff_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TimeOff",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TimeOff_userId(ctx context.Context, field graphql.CollectedField, obj *model.TimeOff) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TimeOff_userId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TimeOff_userId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TimeOff",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TimeOff_channelId(ctx context.Context, field graphql.CollectedField, obj *model.TimeOff) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TimeOff_channelId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ChannelID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TimeOff_channelId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TimeOff",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TimeOff_shiftGroupId(ctx context.Context, field graphql.CollectedField, obj *model.TimeOff) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TimeOff_shiftGroupId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ShiftGroupID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TimeOff_shiftGroupId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TimeOff",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TimeOff_startTime(ctx context.Context, field graphql.CollectedField, obj *model.TimeOff) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TimeOff_startTime(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StartTime, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TimeOff_startTime(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TimeOff",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TimeOff_endTime(ctx context.Context, field graphql.CollectedField, obj *model.TimeOff) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TimeOff_endTime(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EndTime, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TimeOff_endTime(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TimeOff",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TimeOff_is24Hours(ctx context.Context, field graphql.CollectedField, obj *model.TimeOff) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TimeOff_is24Hours(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Is24Hours, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TimeOff_is24Hours(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TimeOff",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TimeOff_label(ctx context.Context, field graphql.CollectedField, obj *model.TimeOff) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TimeOff_label(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Label, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TimeOff_label(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TimeOff",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TimeOff_color(ctx context.Context, field graphql.CollectedField, obj *model.TimeOff) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TimeOff_color(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Color, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TimeOff_color(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TimeOff",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TimeOff_note(ctx context.Context, field graphql.CollectedField, obj *model.TimeOff) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TimeOff_note(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Note, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TimeOff_note(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TimeOff",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TimeOff_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.TimeOff) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TimeOff_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TimeOff_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TimeOff",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TimeOffAddResponse_errors(ctx context.Context, field graphql.CollectedField, obj *model.TimeOffAddResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TimeOffAddResponse_errors(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Errors, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ShiftError)
+	fc.Result = res
+	return ec.marshalNShiftError2ᚕᚖshift_group_membersᚋgraphᚋmodelᚐShiftErrorᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TimeOffAddResponse_errors(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TimeOffAddResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "code":
+				return ec.fieldContext_ShiftError_code(ctx, field)
+			case "field":
+				return ec.fieldContext_ShiftError_field(ctx, field)
+			case "message":
+				return ec.fieldContext_ShiftError_message(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ShiftError", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TimeOffAddResponse_timeoff(ctx context.Context, field graphql.CollectedField, obj *model.TimeOffAddResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TimeOffAddResponse_timeoff(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Timeoff, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.AssignedShift)
+	fc.Result = res
+	return ec.marshalOAssignedShift2ᚖshift_group_membersᚋgraphᚋmodelᚐAssignedShift(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TimeOffAddResponse_timeoff(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TimeOffAddResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_AssignedShift_id(ctx, field)
+			case "break":
+				return ec.fieldContext_AssignedShift_break(ctx, field)
+			case "color":
+				return ec.fieldContext_AssignedShift_color(ctx, field)
+			case "startTime":
+				return ec.fieldContext_AssignedShift_startTime(ctx, field)
+			case "endTime":
+				return ec.fieldContext_AssignedShift_endTime(ctx, field)
+			case "is24Hours":
+				return ec.fieldContext_AssignedShift_is24Hours(ctx, field)
+			case "label":
+				return ec.fieldContext_AssignedShift_label(ctx, field)
+			case "note":
+				return ec.fieldContext_AssignedShift_note(ctx, field)
+			case "shiftToOffer":
+				return ec.fieldContext_AssignedShift_shiftToOffer(ctx, field)
+			case "shiftToSwap":
+				return ec.fieldContext_AssignedShift_shiftToSwap(ctx, field)
+			case "toSwapWith":
+				return ec.fieldContext_AssignedShift_toSwapWith(ctx, field)
+			case "userId":
+				return ec.fieldContext_AssignedShift_userId(ctx, field)
+			case "channelId":
+				return ec.fieldContext_AssignedShift_channelId(ctx, field)
+			case "shiftGroupId":
+				return ec.fieldContext_AssignedShift_shiftGroupId(ctx, field)
+			case "type":
+				return ec.fieldContext_AssignedShift_type(ctx, field)
+			case "isOpen":
+				return ec.fieldContext_AssignedShift_isOpen(ctx, field)
+			case "isShared":
+				return ec.fieldContext_AssignedShift_isShared(ctx, field)
+			case "ShiftActivities":
+				return ec.fieldContext_AssignedShift_ShiftActivities(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_AssignedShift_createdAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AssignedShift", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TimeOffDeleteResponse_errors(ctx context.Context, field graphql.CollectedField, obj *model.TimeOffDeleteResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TimeOffDeleteResponse_errors(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Errors, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ShiftError)
+	fc.Result = res
+	return ec.marshalNShiftError2ᚕᚖshift_group_membersᚋgraphᚋmodelᚐShiftErrorᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TimeOffDeleteResponse_errors(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TimeOffDeleteResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "code":
+				return ec.fieldContext_ShiftError_code(ctx, field)
+			case "field":
+				return ec.fieldContext_ShiftError_field(ctx, field)
+			case "message":
+				return ec.fieldContext_ShiftError_message(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ShiftError", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TimeOffDeleteResponse_timeoff(ctx context.Context, field graphql.CollectedField, obj *model.TimeOffDeleteResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TimeOffDeleteResponse_timeoff(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Timeoff, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.AssignedShift)
+	fc.Result = res
+	return ec.marshalOAssignedShift2ᚖshift_group_membersᚋgraphᚋmodelᚐAssignedShift(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TimeOffDeleteResponse_timeoff(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TimeOffDeleteResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_AssignedShift_id(ctx, field)
+			case "break":
+				return ec.fieldContext_AssignedShift_break(ctx, field)
+			case "color":
+				return ec.fieldContext_AssignedShift_color(ctx, field)
+			case "startTime":
+				return ec.fieldContext_AssignedShift_startTime(ctx, field)
+			case "endTime":
+				return ec.fieldContext_AssignedShift_endTime(ctx, field)
+			case "is24Hours":
+				return ec.fieldContext_AssignedShift_is24Hours(ctx, field)
+			case "label":
+				return ec.fieldContext_AssignedShift_label(ctx, field)
+			case "note":
+				return ec.fieldContext_AssignedShift_note(ctx, field)
+			case "shiftToOffer":
+				return ec.fieldContext_AssignedShift_shiftToOffer(ctx, field)
+			case "shiftToSwap":
+				return ec.fieldContext_AssignedShift_shiftToSwap(ctx, field)
+			case "toSwapWith":
+				return ec.fieldContext_AssignedShift_toSwapWith(ctx, field)
+			case "userId":
+				return ec.fieldContext_AssignedShift_userId(ctx, field)
+			case "channelId":
+				return ec.fieldContext_AssignedShift_channelId(ctx, field)
+			case "shiftGroupId":
+				return ec.fieldContext_AssignedShift_shiftGroupId(ctx, field)
+			case "type":
+				return ec.fieldContext_AssignedShift_type(ctx, field)
+			case "isOpen":
+				return ec.fieldContext_AssignedShift_isOpen(ctx, field)
+			case "isShared":
+				return ec.fieldContext_AssignedShift_isShared(ctx, field)
+			case "ShiftActivities":
+				return ec.fieldContext_AssignedShift_ShiftActivities(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_AssignedShift_createdAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AssignedShift", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TimeOffEditResponse_errors(ctx context.Context, field graphql.CollectedField, obj *model.TimeOffEditResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TimeOffEditResponse_errors(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Errors, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ShiftError)
+	fc.Result = res
+	return ec.marshalNShiftError2ᚕᚖshift_group_membersᚋgraphᚋmodelᚐShiftErrorᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TimeOffEditResponse_errors(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TimeOffEditResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "code":
+				return ec.fieldContext_ShiftError_code(ctx, field)
+			case "field":
+				return ec.fieldContext_ShiftError_field(ctx, field)
+			case "message":
+				return ec.fieldContext_ShiftError_message(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ShiftError", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TimeOffEditResponse_timeoff(ctx context.Context, field graphql.CollectedField, obj *model.TimeOffEditResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TimeOffEditResponse_timeoff(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Timeoff, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.AssignedShift)
+	fc.Result = res
+	return ec.marshalOAssignedShift2ᚖshift_group_membersᚋgraphᚋmodelᚐAssignedShift(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TimeOffEditResponse_timeoff(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TimeOffEditResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_AssignedShift_id(ctx, field)
+			case "break":
+				return ec.fieldContext_AssignedShift_break(ctx, field)
+			case "color":
+				return ec.fieldContext_AssignedShift_color(ctx, field)
+			case "startTime":
+				return ec.fieldContext_AssignedShift_startTime(ctx, field)
+			case "endTime":
+				return ec.fieldContext_AssignedShift_endTime(ctx, field)
+			case "is24Hours":
+				return ec.fieldContext_AssignedShift_is24Hours(ctx, field)
+			case "label":
+				return ec.fieldContext_AssignedShift_label(ctx, field)
+			case "note":
+				return ec.fieldContext_AssignedShift_note(ctx, field)
+			case "shiftToOffer":
+				return ec.fieldContext_AssignedShift_shiftToOffer(ctx, field)
+			case "shiftToSwap":
+				return ec.fieldContext_AssignedShift_shiftToSwap(ctx, field)
+			case "toSwapWith":
+				return ec.fieldContext_AssignedShift_toSwapWith(ctx, field)
+			case "userId":
+				return ec.fieldContext_AssignedShift_userId(ctx, field)
+			case "channelId":
+				return ec.fieldContext_AssignedShift_channelId(ctx, field)
+			case "shiftGroupId":
+				return ec.fieldContext_AssignedShift_shiftGroupId(ctx, field)
+			case "type":
+				return ec.fieldContext_AssignedShift_type(ctx, field)
+			case "isOpen":
+				return ec.fieldContext_AssignedShift_isOpen(ctx, field)
+			case "isShared":
+				return ec.fieldContext_AssignedShift_isShared(ctx, field)
+			case "ShiftActivities":
+				return ec.fieldContext_AssignedShift_ShiftActivities(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_AssignedShift_createdAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AssignedShift", field.Name)
 		},
 	}
 	return fc, nil
@@ -9787,6 +11603,107 @@ func (ec *executionContext) unmarshalInputShiftGroupMemberInput(ctx context.Cont
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputTimeOffInput(ctx context.Context, obj interface{}) (model.TimeOffInput, error) {
+	var it model.TimeOffInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"userId", "channelId", "shiftGroupId", "startTime", "endTime", "is24Hours", "label", "color", "note"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "userId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserID = data
+		case "channelId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("channelId"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ChannelID = data
+		case "shiftGroupId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("shiftGroupId"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ShiftGroupID = data
+		case "startTime":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("startTime"))
+			data, err := ec.unmarshalNTime2timeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.StartTime = data
+		case "endTime":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("endTime"))
+			data, err := ec.unmarshalNTime2timeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EndTime = data
+		case "is24Hours":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is24Hours"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Is24Hours = data
+		case "label":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("label"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Label = data
+		case "color":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
+			data, err := ec.unmarshalNShiftColorEnum2shift_group_membersᚋgraphᚋmodelᚐShiftColorEnum(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Color = data
+		case "note":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("note"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Note = data
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -10169,6 +12086,33 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 				return ec._Mutation_shiftGroupMemberRemove(ctx, field)
 			})
 
+		case "createTimeOff":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createTimeOff(ctx, field)
+			})
+
+		case "updateTimeOff":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateTimeOff(ctx, field)
+			})
+
+		case "deleteTimeOff":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteTimeOff(ctx, field)
+			})
+
+		case "deleteTimeOffs":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteTimeOffs(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -10549,6 +12493,52 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
+		case "getTimeOff":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getTimeOff(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "getTimeOffs":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getTimeOffs(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
 		case "__type":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -10828,6 +12818,188 @@ func (ec *executionContext) _Shifts(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var timeOffImplementors = []string{"TimeOff"}
+
+func (ec *executionContext) _TimeOff(ctx context.Context, sel ast.SelectionSet, obj *model.TimeOff) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, timeOffImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TimeOff")
+		case "id":
+
+			out.Values[i] = ec._TimeOff_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "userId":
+
+			out.Values[i] = ec._TimeOff_userId(ctx, field, obj)
+
+		case "channelId":
+
+			out.Values[i] = ec._TimeOff_channelId(ctx, field, obj)
+
+		case "shiftGroupId":
+
+			out.Values[i] = ec._TimeOff_shiftGroupId(ctx, field, obj)
+
+		case "startTime":
+
+			out.Values[i] = ec._TimeOff_startTime(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "endTime":
+
+			out.Values[i] = ec._TimeOff_endTime(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "is24Hours":
+
+			out.Values[i] = ec._TimeOff_is24Hours(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "label":
+
+			out.Values[i] = ec._TimeOff_label(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "color":
+
+			out.Values[i] = ec._TimeOff_color(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "note":
+
+			out.Values[i] = ec._TimeOff_note(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdAt":
+
+			out.Values[i] = ec._TimeOff_createdAt(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var timeOffAddResponseImplementors = []string{"TimeOffAddResponse"}
+
+func (ec *executionContext) _TimeOffAddResponse(ctx context.Context, sel ast.SelectionSet, obj *model.TimeOffAddResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, timeOffAddResponseImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TimeOffAddResponse")
+		case "errors":
+
+			out.Values[i] = ec._TimeOffAddResponse_errors(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "timeoff":
+
+			out.Values[i] = ec._TimeOffAddResponse_timeoff(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var timeOffDeleteResponseImplementors = []string{"TimeOffDeleteResponse"}
+
+func (ec *executionContext) _TimeOffDeleteResponse(ctx context.Context, sel ast.SelectionSet, obj *model.TimeOffDeleteResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, timeOffDeleteResponseImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TimeOffDeleteResponse")
+		case "errors":
+
+			out.Values[i] = ec._TimeOffDeleteResponse_errors(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "timeoff":
+
+			out.Values[i] = ec._TimeOffDeleteResponse_timeoff(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var timeOffEditResponseImplementors = []string{"TimeOffEditResponse"}
+
+func (ec *executionContext) _TimeOffEditResponse(ctx context.Context, sel ast.SelectionSet, obj *model.TimeOffEditResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, timeOffEditResponseImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TimeOffEditResponse")
+		case "errors":
+
+			out.Values[i] = ec._TimeOffEditResponse_errors(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "timeoff":
+
+			out.Values[i] = ec._TimeOffEditResponse_timeoff(ctx, field, obj)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -11337,6 +13509,64 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) marshalNAssignedShift2shift_group_membersᚋgraphᚋmodelᚐAssignedShift(ctx context.Context, sel ast.SelectionSet, v model.AssignedShift) graphql.Marshaler {
+	return ec._AssignedShift(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNAssignedShift2ᚕᚖshift_group_membersᚋgraphᚋmodelᚐAssignedShiftᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.AssignedShift) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNAssignedShift2ᚖshift_group_membersᚋgraphᚋmodelᚐAssignedShift(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNAssignedShift2ᚖshift_group_membersᚋgraphᚋmodelᚐAssignedShift(ctx context.Context, sel ast.SelectionSet, v *model.AssignedShift) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AssignedShift(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -11450,6 +13680,16 @@ func (ec *executionContext) marshalNResponseStatus2ᚖshift_group_membersᚋgrap
 		return graphql.Null
 	}
 	return ec._ResponseStatus(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNShiftColorEnum2shift_group_membersᚋgraphᚋmodelᚐShiftColorEnum(ctx context.Context, v interface{}) (model.ShiftColorEnum, error) {
+	var res model.ShiftColorEnum
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNShiftColorEnum2shift_group_membersᚋgraphᚋmodelᚐShiftColorEnum(ctx context.Context, sel ast.SelectionSet, v model.ShiftColorEnum) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) marshalNShiftError2ᚕᚖshift_group_membersᚋgraphᚋmodelᚐShiftErrorᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ShiftError) graphql.Marshaler {
@@ -11587,6 +13827,11 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNTimeOffInput2shift_group_membersᚋgraphᚋmodelᚐTimeOffInput(ctx context.Context, v interface{}) (model.TimeOffInput, error) {
+	res, err := ec.unmarshalInputTimeOffInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNUser2ᚕᚖshift_group_membersᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v []*model.User) graphql.Marshaler {
@@ -12411,6 +14656,27 @@ func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel
 	}
 	res := graphql.MarshalTime(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOTimeOffAddResponse2ᚖshift_group_membersᚋgraphᚋmodelᚐTimeOffAddResponse(ctx context.Context, sel ast.SelectionSet, v *model.TimeOffAddResponse) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._TimeOffAddResponse(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOTimeOffDeleteResponse2ᚖshift_group_membersᚋgraphᚋmodelᚐTimeOffDeleteResponse(ctx context.Context, sel ast.SelectionSet, v *model.TimeOffDeleteResponse) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._TimeOffDeleteResponse(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOTimeOffEditResponse2ᚖshift_group_membersᚋgraphᚋmodelᚐTimeOffEditResponse(ctx context.Context, sel ast.SelectionSet, v *model.TimeOffEditResponse) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._TimeOffEditResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOUniqueShifts2ᚖshift_group_membersᚋgraphᚋmodelᚐUniqueShifts(ctx context.Context, sel ast.SelectionSet, v *model.UniqueShifts) graphql.Marshaler {
